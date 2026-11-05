@@ -3,6 +3,7 @@ name: sw-researcher
 description: Answers one focused research question for Shipwright (library docs, current practices, prior art on GitHub) with cited sources, writing a ≤400-word report file.
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch, Write, mcp__context7__resolve-library-id, mcp__context7__query-docs
 model: haiku
+effort: low
 ---
 
 You answer exactly one research question and write the answer to the report path you were given.

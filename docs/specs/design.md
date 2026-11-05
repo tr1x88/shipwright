@@ -74,7 +74,7 @@ Non-goals: design/media/3D/e-commerce skills, document generation, kanban/journa
 
 ### 2. Architect (`sw:architect`) — main thread, Opus
 - Reads research first; never asks what the code already answers.
-- Interviews **one question at a time** via AskUserQuestion, each with a recommended option and what it changes. Only checklist items the task touches; soft cap ~10:
+- Interviews in **batches of up to 4 independent questions** per AskUserQuestion call (≤ 3 calls), each with a recommended option and what it changes. Only checklist items the task touches; soft cap ~10:
   data model & migration/backfill · API contract & backward compatibility · transactions/consistency · idempotency & retries · concurrency/races · cache & invalidation · authn/authz & data exposure · failure modes & timeouts · performance (N+1, indexes, pagination, payload size) · observability (logs/metrics) · rollout (flag, rollback, migration order).
 - Presents 2–3 approaches with trade-offs; user picks.
 - Writes `design.md`: problem, decision, rejected alternatives, contracts, data changes, risks, test strategy. **Gate 1.**
@@ -94,10 +94,12 @@ Non-goals: design/media/3D/e-commerce skills, document generation, kanban/journa
 ### 5. Build (`sw:build`)
 - **Tiered TDD**: service/domain logic and every bug fix → failing test first (bug: reproduce red first). Endpoints → integration/e2e. Config/DTO/wiring → no TDD required.
 - Tests touching DB → real Postgres (worktree DB). Unit tests → mock repositories.
-- small → inline. large → one `sw-implementer` (Sonnet) per task + `sw-spec-checker` (Sonnet, spec compliance only) after each.
+- small → one `sw-implementer` (Sonnet) for the whole plan; main thread only orchestrates. large → one `sw-implementer` per task; `sw-spec-checker` only when the implementer reports concerns (whole-branch review covers spec compliance).
+- Focused + touched-module tests per task; the full suite runs once, in verify.
 - Commit per task as checkpoints.
 
-### 6. Verify (`sw:verify`) — runs in `sw-verifier` (Sonnet) to keep logs out of main context
+### 6. Verify (`sw:verify`) — runs in `sw-verifier` (Haiku report-only, Sonnet fix mode) to keep logs out of main context
+Small tasks skip build unless build config/deps/wiring changed, and Playwright unless frontend files changed.
 Order: lint/format → typecheck → unit → integration (coverage ≥ 80% on changed files) → build → start dev server (random port) → API smoke → Playwright headless (frontend only).
 - **API smoke**: hit every changed endpoint with success + error cases (400/401/403/404/409); report as table + re-runnable curl lines.
 - **Auth for smoke** (local only): read the auth code, temporarily bypass/mock it. Three guards:
@@ -108,7 +110,7 @@ Order: lint/format → typecheck → unit → integration (coverage ≥ 80% on c
 - Failure → fix → re-run from the failing step; ≤ 3 rounds, then stop and report.
 
 ### 7. Review (`sw:review`)
-- One `sw-reviewer` (Opus) over the whole branch diff vs base: correctness, plan/design adherence, plus lenses loaded only when relevant: security, performance, Prisma, Redis, Docker, API design.
+- One `sw-reviewer` over the whole branch diff vs base — Sonnet for small (1 re-review), Opus for large or security-sensitive (2 re-reviews): correctness, plan/design adherence, plus lenses loaded only when relevant: security, performance, Prisma, Redis, Docker, API design.
 - Critical/Important fixed before PR (then re-verify affected steps).
 
 ### 8. llms.txt (`sw:llms-txt`, generalized from `llms-txt-sync`)
@@ -153,16 +155,16 @@ Order: lint/format → typecheck → unit → integration (coverage ≥ 80% on c
 - `sw:frontend`: React/Next best practices (claudekit react-best-practices, frontend-development, web-design-guidelines), Playwright testing.
 
 **Agents** (model pinned in frontmatter)
-| Agent | Model | Role |
+| Agent | Model · effort | Role |
 |---|---|---|
-| `sw-scout` | Haiku | code discovery, ≤ 300-word report |
-| `sw-researcher` | Haiku | docs/web/gh research, ≤ 400-word report |
-| `sw-implementer` | Sonnet | one plan task, TDD |
-| `sw-spec-checker` | Sonnet | task ↔ spec compliance |
-| `sw-verifier` | Sonnet | verify pipeline, compact table report |
+| `sw-scout` | Haiku · low | code discovery, ≤ 300-word report |
+| `sw-researcher` | Haiku · low | docs/web/gh research, ≤ 400-word report |
+| `sw-implementer` | Sonnet · medium | one plan task (large) or whole small plan, TDD |
+| `sw-spec-checker` | Sonnet · medium | task ↔ spec compliance, only on implementer concerns |
+| `sw-verifier` | Sonnet · medium (Haiku override for report-only) | verify pipeline, compact table report |
 | `sw-debugger` | Sonnet | root-cause investigation for failing verify / dev smoke |
-| `sw-docs-writer` | Sonnet | llms.txt + PR description drafting |
-| `sw-reviewer` | Opus | whole-branch review |
+| `sw-docs-writer` | Sonnet · medium (Haiku override for PR body) | llms.txt + PR description drafting |
+| `sw-reviewer` | Opus (Sonnet override for small) | whole-branch review |
 
 Architect interview and gates run in the main thread.
 

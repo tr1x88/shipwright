@@ -66,15 +66,15 @@ git clone https://github.com/jamesngdev/shipwright && cd shipwright
  triage ── tiny ──► branch in place → edit → quick verify → llms.txt → PR
         └─ small / large
              1 discover     code map (+ docs, best practices, prior art for large)
-             2 architect ⛔  one-question-at-a-time interview → 2–3 approaches → design.md
+             2 architect ⛔  batched interview (≤ 4 questions per prompt) → 2–3 approaches → design.md
                             (+ threat model for large / security-sensitive tasks)
              3 plan      ⛔  file map + test-first tasks (+ red-team for large)
              ─── approved: runs continuously from here ───
              4 worktree     .worktree/feat-<slug> + own DB, Redis db, port
-             5 build        tiered TDD · inline (small) or 1 subagent per task (large)
+             5 build        tiered TDD · 1 Sonnet implementer (small) or 1 per task (large)
              6 verify       lint → typecheck → unit → integration → coverage ≥ 80%
                             → build → dev server → API smoke → Playwright
-             7 review       one Opus whole-branch review (+ security / performance lenses)
+             7 review       one whole-branch review: Sonnet (small) / Opus (large, security)
              8 llms-txt     client-facing docs synced (every feature)
              9 pr           1–3 commits · PR → base (kept open) + PR → develop
             10 verify-dev   after merge + your "deployed": smoke on the dev domain, logs on failure
@@ -99,16 +99,16 @@ Every other decision is made on the spot and logged in `plan.md` as `Ruling: <de
 | `/sw:architect` | Architecture interview: data model, API contract, consistency, idempotency, concurrency, cache, authz, failure modes, performance, observability, rollout → `design.md` |
 | `/sw:plan` | Exact files, signatures and named tests per task; red-team for large plans → `plan.md` |
 | `/sw:worktree` · `/sw:cleanup` | Isolated workspace with its own DB/Redis/port · teardown |
-| `/sw:build` | Tiered TDD execution (inline or `sw-implementer` + `sw-spec-checker` per task) |
+| `/sw:build` | Tiered TDD execution via `sw-implementer` (one for small, one per task for large; `sw-spec-checker` only on concerns) |
 | `/sw:debug` | Root cause first: reproduce → trace → one hypothesis at a time → failing test → fix |
 | `/sw:verify` | The local gate, with a temporary, guarded auth bypass for smoke tests |
-| `/sw:review` | `sw-reviewer` (Opus) against design + plan; how to receive feedback |
+| `/sw:review` | `sw-reviewer` (Sonnet for small, Opus for large/security) against design + plan; how to receive feedback |
 | `/sw:llms-txt` | Sync `llms.txt` + topic files ([llmstxt.org](https://llmstxt.org)); `audit` mode for drift |
 | `/sw:pr` | Squash, SSH identity, dual PR, integration branch on conflict |
 | `/sw:verify-dev` | Post-deploy smoke on dev; feature bugs are auto-fixed for up to 2 rounds |
 | `/sw:node-backend` · `/sw:go` · `/sw:frontend` | Stack knowledge packs, loaded only when relevant |
 
-**Agents** (models pinned): `sw-scout` and `sw-researcher` (Haiku) · `sw-implementer`, `sw-spec-checker`, `sw-verifier`, `sw-debugger` and `sw-docs-writer` (Sonnet) · `sw-reviewer` (Opus).
+**Agents** (model + effort pinned, overridden per call where it pays): `sw-scout` and `sw-researcher` (Haiku, low effort) · `sw-implementer`, `sw-spec-checker`, `sw-debugger` (Sonnet) · `sw-verifier` (Haiku report-only, Sonnet fix mode) · `sw-docs-writer` (Sonnet llms.txt, Haiku PR body) · `sw-reviewer` (Sonnet small, Opus large/security). The main thread only does judgment work; full test suite runs once, in verify.
 
 ## Tiered TDD
 

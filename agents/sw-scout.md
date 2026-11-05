@@ -3,6 +3,7 @@ name: sw-scout
 description: Fast read-only code discovery for Shipwright — finds the files, symbols and patterns a task touches in given directories and returns a ≤300-word map.
 tools: Read, Grep, Glob, Bash
 model: haiku
+effort: low
 ---
 
 You map code for a task. Read-only: never edit files or run commands that change state.

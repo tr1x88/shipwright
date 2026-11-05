@@ -21,7 +21,7 @@ If the user's instructions define per-owner identity switches (e.g. `aw` work / 
 `git ls-remote --exit-code --heads origin $BRANCH` fails → squash checkpoints into 1–3 meaningful commits (e.g. spec+migration, feature, tests/docs): `git reset --soft $(git merge-base origin/<parent> HEAD)` then commit in logical groups. Already pushed → keep history (no force-push).
 
 ## 4. Push and draft
-`git push -u origin $BRANCH`. Body (same for both PRs) written to `.sw/pr-body.md`:
+`git push -u origin $BRANCH`. Body (same for both PRs) written to `.sw/pr-body.md` — write it yourself or dispatch `sw-docs-writer` (pr-body) with `model: haiku`:
 ```markdown
 ## Summary
 <what and why, grouped by area; link docs/specs/<YYMMDD>-<slug>/design.md>

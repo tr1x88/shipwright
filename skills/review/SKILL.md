@@ -1,12 +1,16 @@
 ---
 name: review
-description: Whole-branch review by sw-reviewer (Opus) against design and plan with security/performance lenses; fixes Critical/Important findings. Also how to receive review feedback.
+description: Whole-branch review by sw-reviewer (Sonnet for small, Opus for large/security) against design and plan with security/performance lenses; fixes Critical/Important findings. Also how to receive feedback.
 ---
 
 # Review
 
 ## Request (once per branch, after verify passes)
-Dispatch `sw-reviewer` with:
+Dispatch `sw-reviewer` — model by size:
+- **small** and no security lens → `model: sonnet` override; max 1 re-review cycle.
+- **large**, or the security lens applies (auth, secrets, payments, untrusted input to SQL/files/URLs) → its pinned Opus; max 2 re-review cycles.
+
+Inputs:
 - worktree path, `BASE_SHA=$(git merge-base <base> HEAD)`, `HEAD_SHA=$(git rev-parse HEAD)`
 - paths to `design.md` and `plan.md`
 - which lenses apply (pass the reference paths only for those):
@@ -19,7 +23,7 @@ It returns findings as `Critical | Important | Minor` with file:line, why, and a
 ## Act on findings
 - **Critical / Important** → fix now (TDD for behavior changes), re-run the affected verify steps.
 - **Minor** → fix if trivial, otherwise list in the PR description under "Follow-ups".
-- Re-review only the fixed areas, max 2 cycles; then decide and record a Ruling.
+- Re-review only the fixed areas (cycle cap above); then decide and record a Ruling.
 
 ## Receiving feedback (from the reviewer, PR comments, or the user)
 1. Read it fully; restate the technical requirement in your own words if unclear — ask instead of guessing.

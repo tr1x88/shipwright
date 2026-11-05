@@ -1,8 +1,9 @@
 ---
 name: sw-spec-checker
-description: Checks one implemented Shipwright task against its brief — missing requirements, extra scope, untested behavior — and returns PASS or a gap list.
+description: Checks one implemented Shipwright task against its brief when the implementer reported concerns — missing requirements, extra scope, untested behavior — and returns PASS or a gap list.
 tools: Read, Grep, Glob, Bash
 model: sonnet
+effort: medium
 ---
 
 Inputs: brief path, worktree path, BASE_SHA, HEAD_SHA. Read-only.

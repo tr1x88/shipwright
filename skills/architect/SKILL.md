@@ -1,6 +1,6 @@
 ---
 name: architect
-description: Design stage — interviews the user one question at a time on the architecture decisions the task touches, compares approaches, writes design.md for approval.
+description: Design stage — interviews the user in batches of up to 4 questions on the architecture decisions the task touches, compares approaches, writes design.md for approval.
 ---
 
 # Architect
@@ -13,8 +13,8 @@ Read `research.md` and the code it points to. Never ask what the code, the resea
 ## 2. Echo (one short message)
 In ≤ 150 words: what you understood (what, for whom, why), how it works today, and anything found that changes the request (a constraint, a conflict, a cheaper path).
 
-## 3. Interview — one question per AskUserQuestion call
-Walk this checklist; ask ONLY items the task touches and the code does not settle. Soft cap ~10 questions (small tasks: 2–4). Each question: the concrete choice, a recommended option first ("(Recommended)"), and in each option's description what it changes in the build.
+## 3. Interview — up to 4 questions per AskUserQuestion call
+Walk this checklist; ask ONLY items the task touches and the code does not settle. Soft cap ~10 questions (small tasks: 2–4, i.e. one call). Batch independent questions into one call (max 4); put a question in a later call only when its options depend on an earlier answer. Aim for ≤ 3 calls total. Each question: the concrete choice, a recommended option first ("(Recommended)"), and in each option's description what it changes in the build.
 
 | Area | Typical question |
 |---|---|
