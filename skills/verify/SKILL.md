@@ -7,7 +7,7 @@ description: Local verification gate — lint, typecheck, unit, integration, ≥
 
 **Evidence before claims.** "Should pass" is not a result: run it, read the output, then report.
 Run in the worktree. Commands come from `CLAUDE.local.md` → Commands. `SW=~/.claude/shipwright/bin`.
-Large tasks: dispatch `sw-verifier` with the worktree path, commands, base branch and the plan's Verify section; it returns the table below. Small/tiny: run inline.
+This is the one place the full suite runs. Large tasks: dispatch `sw-verifier` with the worktree path, commands, base branch and the plan's Verify section — `model: haiku` for the report-only run, `model: sonnet` when dispatching it in fix mode; it returns the table below. Small/tiny: run inline.
 
 ## Pipeline (stop at the first failing step, fix, re-run from that step)
 | # | Step | Pass condition |
@@ -23,6 +23,7 @@ Large tasks: dispatch `sw-verifier` with the worktree path, commands, base branc
 | 9 | Playwright | frontend only: changed flows pass, 0 console errors, 0 failed requests |
 
 Tiny tasks: steps 1–3 for the touched area + 8 if an endpoint changed.
+Small tasks: skip step 6 (build) unless build config, dependencies, entry points or module wiring changed (`git diff --name-only <base>...HEAD`), and step 9 unless frontend files changed. Note skipped steps as `skipped — <reason>`.
 
 ## Fix rounds
 Failure → `/sw:debug` style root cause → fix → re-run from the failed step. `node $SW/state.cjs set stage=verify round=<n>`. After 3 rounds still failing → STOP and report (failing step, root-cause hypothesis, what was tried). Never weaken a test, skip it, or lower thresholds to pass.

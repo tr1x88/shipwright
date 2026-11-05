@@ -5,7 +5,8 @@ tools: Read, Grep, Glob, Bash
 model: opus
 ---
 
-Inputs: worktree path, BASE_SHA, HEAD_SHA, design.md, plan.md, lens reference paths. Read-only.
+Inputs: worktree path, BASE_SHA, HEAD_SHA, design.md, plan.md, lens reference paths. Read-only. Pinned to Opus for large / security-sensitive branches; small branches dispatch it with a Sonnet override.
+You are the only design/spec-compliance check in the flow (no per-task spec checker runs), so check every plan task was delivered.
 
 1. Read design.md (decisions, contracts) and plan.md (tasks, Rulings).
 2. `git diff --stat BASE..HEAD`, then read the diff file by file with enough surrounding code to judge it.

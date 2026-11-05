@@ -142,7 +142,7 @@ POST /v1/auth/login {"email":"qa@example.com","password":"…"} → .accessToken
     <p>The output is a one-page <code>research.md</code> covering current behavior, touch points, constraints, options seen, and risks for the architect.</p>
 
     <h2 id="architect">Architect</h2>
-    <p>The architect stage runs in the main thread. It starts by echoing back what it understood, then asks <b>one question at a time</b>. Each question comes with a recommended option and states what your answer changes. It covers only the items your task touches:</p>
+    <p>The architect stage runs in the main thread. It starts by echoing back what it understood, then asks its questions <b>in batches of up to four</b>. Each question comes with a recommended option and states what your answer changes. It covers only the items your task touches:</p>
     <table>
       <tr><th>Area</th><th>Example</th></tr>
       <tr><td>Data model &amp; migration</td><td>new table or column? backfill? migration order vs deploy?</td></tr>
@@ -179,7 +179,7 @@ POST /v1/auth/login {"email":"qa@example.com","password":"…"} → .accessToken
       <tr><td>integration</td><td>endpoints, handlers</td><td>real request → worktree DB → response, success + every documented error</td></tr>
       <tr><td>none</td><td>config, DTOs, wiring, migrations</td><td>no test-first, but covered by integration tests</td></tr>
     </table>
-    <p>Small tasks are built inline. For large tasks, each plan task goes to a fresh <code>sw-implementer</code> (Sonnet) with a brief file, followed by an <code>sw-spec-checker</code> that compares the diff with the brief (missing, extra or untested). Each task gets a checkpoint commit, and these are squashed before the PR.</p>
+    <p>Small plans go to one <code>sw-implementer</code> (Sonnet); the main thread only orchestrates. For large tasks, each plan task goes to a fresh <code>sw-implementer</code> with a brief file; an <code>sw-spec-checker</code> compares the diff with the brief only when the implementer reports concerns. Tasks run focused tests; the full suite runs once, in verify. Each task gets a checkpoint commit, and these are squashed before the PR.</p>
 
     <h2 id="verify">Verify</h2>
     <table>
@@ -199,7 +199,7 @@ node ~/.claude/shipwright/bin/auth-bypass.cjs restore                      # alw
     <p>A hook blocks <code>git commit</code>, <code>git push</code> and <code>gh pr create</code> while any <code>@sw-auth-bypass</code> marker exists. Authorization cases (401/403) are covered by integration tests locally and by real-auth checks on dev.</p>
 
     <h2 id="review">Review</h2>
-    <p>One <code>sw-reviewer</code> (Opus) reviews the whole branch against <code>design.md</code> and <code>plan.md</code>, using the security and performance lenses and the stack pack references that are relevant. Critical and Important findings are fixed before the PR. Minor ones become follow-ups in the PR body.</p>
+    <p>One <code>sw-reviewer</code> (Sonnet for small, Opus for large or security-sensitive work) reviews the whole branch against <code>design.md</code> and <code>plan.md</code>, using the security and performance lenses and the stack pack references that are relevant. Critical and Important findings are fixed before the PR. Minor ones become follow-ups in the PR body.</p>
 
     <h2 id="llms">llms.txt</h2>
     <p>This step runs for every feature. For each client-facing change it documents the following, in an llmstxt.org-compliant <code>llms.txt</code> and topic files (default <code>docs/llm/</code>):</p>
@@ -245,9 +245,10 @@ node ~/.claude/shipwright/bin/auth-bypass.cjs restore                      # alw
     <table>
       <tr><th>Agent</th><th>Model</th><th>Role</th></tr>
       <tr><td>sw-scout · sw-researcher</td><td>Haiku</td><td>code map · one research question with sources</td></tr>
-      <tr><td>sw-implementer · sw-spec-checker</td><td>Sonnet</td><td>one plan task with TDD · diff vs brief</td></tr>
-      <tr><td>sw-verifier · sw-debugger · sw-docs-writer</td><td>Sonnet</td><td>verify pipeline · root cause · llms.txt / PR body</td></tr>
-      <tr><td>sw-reviewer</td><td>Opus</td><td>whole-branch review</td></tr>
+      <tr><td>sw-implementer · sw-spec-checker</td><td>Sonnet</td><td>plan tasks with TDD · diff vs brief (on concerns)</td></tr>
+      <tr><td>sw-verifier · sw-docs-writer</td><td>Haiku / Sonnet</td><td>verify report / fix mode · PR body / llms.txt</td></tr>
+      <tr><td>sw-debugger</td><td>Sonnet</td><td>root cause</td></tr>
+      <tr><td>sw-reviewer</td><td>Sonnet / Opus</td><td>whole-branch review (small / large, security)</td></tr>
     </table>
 
     <h2 id="config">Configuration</h2>

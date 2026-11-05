@@ -18,8 +18,8 @@ Read just enough code to size the task (codegraph / Grep, not whole files), then
 | Size | When | Flow |
 |---|---|---|
 | tiny | ≤ ~20 lines, one file, no schema/API/contract change, intent obvious | branch in place → edit → verify(fast) → llms-txt → pr |
-| small | one module, no new data model, ≤ ~5 tasks | discover(code) → architect(light) → plan → worktree → build(inline) → verify → review → llms-txt → pr → verify-dev |
-| large | new model/migration, API contract change, cross-module, concurrency/cache/security impact, or > 5 tasks | all stages, research included, plan red-team, build via subagents |
+| small | one module, no new data model, ≤ ~5 tasks | discover(code) → architect(light) → plan → worktree → build(one implementer) → verify(lean) → review(Sonnet) → llms-txt → pr → verify-dev |
+| large | new model/migration, API contract change, cross-module, concurrency/cache/security impact, or > 5 tasks | all stages, research included, plan red-team, one implementer per task, review(Opus) |
 
 User flags override. State the size and one-line reason, then continue (no confirmation needed).
 Track progress: `node $SW/state.cjs set slug=<slug> size=<size> stage=<stage>` at the start of each stage (in the main checkout until the worktree exists, then in the worktree).
@@ -53,10 +53,13 @@ Stop and ask ONLY for:
 
 Everything else: decide, then append to `plan.md` → `## Rulings`: `Ruling: <decision> — <why> — <cost if wrong>`. Keep going.
 
-## 4. Context discipline
+## 4. Model routing
+The main thread (usually Opus) does judgment: triage, architect, plan, orchestration, Rulings. Code writing, command running and template filling go to subagents on cheaper models — see each stage. Use the Agent tool's `model` override where a stage says so; never upgrade a subagent's model without a reason recorded as a Ruling.
+
+## 5. Context discipline
 - Subagents get exactly the context they need (file paths, the task text) — never your history.
 - Ask subagents for short reports; read their files only when needed.
 - Never paste large logs into the conversation; summarize the failing part.
 
-## 5. Finish
+## 6. Finish
 After `/sw:pr`: report PR URLs, verify summary, rulings made. Then `/sw:verify-dev` polls for the merge. After it passes, remind the user that `/sw:cleanup <slug>` drops the worktree, DB and Redis db once the PR to the base branch is merged.

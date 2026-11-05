@@ -84,7 +84,7 @@
       <div class="step"><h4>worktree</h4><p><code>.worktree/</code> with its own DB, Redis db and port.</p></div>
       <div class="step"><h4>build</h4><p>Tiered TDD, with one subagent per task on large work.</p></div>
       <div class="step"><h4>verify</h4><p>Lint → types → unit → integration → coverage → build → dev server → smoke → Playwright.</p></div>
-      <div class="step"><h4>review</h4><p>One Opus pass over the whole branch with security and performance lenses.</p></div>
+      <div class="step"><h4>review</h4><p>One whole-branch pass (Sonnet for small, Opus for large) with security and performance lenses.</p></div>
       <div class="step"><h4>llms-txt</h4><p>Client-facing docs synced with every feature.</p></div>
       <div class="step"><h4>pr</h4><p>1–3 commits. PR → base (kept open) and PR → develop.</p></div>
       <div class="step"><h4>verify-dev</h4><p>After merge and deploy, a smoke test on the dev domain, with logs on failure.</p></div>
