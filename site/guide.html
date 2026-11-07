@@ -117,8 +117,8 @@ POST /v1/auth/login {"email":"qa@example.com","password":"…"} → .accessToken
     <table>
       <tr><th>Size</th><th>When</th><th>What runs</th></tr>
       <tr><td><b>tiny</b></td><td>≤ ~20 lines, one file, no schema/API change</td><td>branch in place → edit → quick verify → llms-txt → PR</td></tr>
-      <tr><td><b>small</b></td><td>one module, no new data model, ≤ ~5 tasks</td><td>code scout → light architect → plan → worktree → inline build → verify → review → llms-txt → PR → verify-dev</td></tr>
-      <tr><td><b>large</b></td><td>new model or migration, contract change, cross-module, concurrency/cache/security impact</td><td>everything, including parallel research, plan red-team and subagent build</td></tr>
+      <tr><td><b>small</b></td><td>one module, no new data model, ≤ ~5 tasks</td><td>code scout → light architect → plan → worktree → parallel build → verify → review → llms-txt → PR → verify-dev</td></tr>
+      <tr><td><b>large</b></td><td>new model or migration, contract change, cross-module, concurrency/cache/security impact</td><td>everything, including parallel research, plan red-team, parallel build waves and parallel review lenses</td></tr>
     </table>
     <p>There are two gates (⛔): the <b>design</b> and the <b>plan</b>. After you approve the plan, Shipwright stops only for:</p>
     <ol>
@@ -179,7 +179,7 @@ POST /v1/auth/login {"email":"qa@example.com","password":"…"} → .accessToken
       <tr><td>integration</td><td>endpoints, handlers</td><td>real request → worktree DB → response, success + every documented error</td></tr>
       <tr><td>none</td><td>config, DTOs, wiring, migrations</td><td>no test-first, but covered by integration tests</td></tr>
     </table>
-    <p>Small plans go to one <code>sw-implementer</code> (Sonnet); the main thread only orchestrates. For large tasks, each plan task goes to a fresh <code>sw-implementer</code> with a brief file; an <code>sw-spec-checker</code> compares the diff with the brief only when the implementer reports concerns. Tasks run focused tests; the full suite runs once, in verify. Each task gets a checkpoint commit, and these are squashed before the PR.</p>
+    <p>The plan groups tasks into waves: tasks in a wave have disjoint files and no dependencies on each other. Build dispatches every task of a wave at once — one <code>sw-implementer</code> (Sonnet) per task, all in one message — and the main thread commits each task's files when the wave returns. Shared foundations (migrations, dependencies, shared types) run first in a serial wave; an <code>sw-spec-checker</code> compares the diff with the brief only when the implementer reports concerns. Tasks run focused tests; the full suite runs once, in verify. Each task gets a checkpoint commit, and these are squashed before the PR.</p>
 
     <h2 id="verify">Verify</h2>
     <table>

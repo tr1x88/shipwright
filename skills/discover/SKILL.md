@@ -7,7 +7,10 @@ description: Research stage — maps relevant code and, for large tasks, library
 
 Output: `<main>/.sw/specs/<slug>/research.md` — at most one page. Facts with file:line or URL, no filler.
 
+Run everything independent **at once**: in one message dispatch the scouts and (for large tasks) the researchers together, while you read the entry points yourself.
+
 ## Code (always)
+0. Task spans ≥ 2 areas (e.g. API + worker, backend + frontend, two modules)? Dispatch one `sw-scout` per area **in one message**, each with explicit directories and the question "which files/symbols/tests does <task> touch here?". Merge their maps.
 1. CodeGraph first if the repo has `.codegraph/`: `codegraph_explore` with the symbols/flow the task touches. Otherwise targeted Grep/Glob, then Read only the relevant ranges.
 2. Find: entry points (routes/handlers/pages), the data model and migrations, services the change passes through, existing tests for that area, similar features to copy patterns from, config/env/feature flags involved.
 3. Small task: stop here.
@@ -17,7 +20,7 @@ Dispatch 2–3 `sw-researcher` agents **in one message** (parallel), each with O
 - library docs — "How does <lib vX> do <thing>? Breaking changes since <version in lockfile>?" (context7 first)
 - practice — "Proven approaches + pitfalls for <problem> at <scale>" (WebSearch, prefer official docs and engineering blogs < 2 years old)
 - prior art — "How do well-maintained repos implement <thing>?" (`gh search code '<query>' --limit 10`, then read 1–2 files)
-Give each: the question, versions from the lockfile, what is already known, and the report path `<main>/.sw/specs/<slug>/research-<topic>.md`. For a very wide codebase, add one `sw-scout` with explicit directories.
+Give each: the question, versions from the lockfile, what is already known, and the report path `<main>/.sw/specs/<slug>/research-<topic>.md`. Send them in the same message as the scouts from step 0 — code mapping and research run concurrently.
 
 ## research.md template
 ```markdown

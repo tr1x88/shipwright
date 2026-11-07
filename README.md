@@ -95,11 +95,11 @@ Every other decision is made on the spot and logged in `plan.md` as `Ruling: <de
 | Command | Purpose |
 |---|---|
 | `/sw:ship <task>` | The whole flow. `--tiny` / `--small` / `--large` to force a size, `--resume` to continue |
-| `/sw:discover` | Code map + parallel research (context7 docs, web, `gh search code`) → `research.md` |
+| `/sw:discover` | Parallel scouts + parallel research (context7 docs, web, `gh search code`) → `research.md` |
 | `/sw:architect` | Architecture interview: data model, API contract, consistency, idempotency, concurrency, cache, authz, failure modes, performance, observability, rollout → `design.md` |
-| `/sw:plan` | Exact files, signatures and named tests per task; red-team for large plans → `plan.md` |
+| `/sw:plan` | Exact files, dependencies and named tests per task, grouped into parallel waves; red-team for large plans → `plan.md` |
 | `/sw:worktree` · `/sw:cleanup` | Isolated workspace with its own DB/Redis/port · teardown |
-| `/sw:build` | Tiered TDD execution via `sw-implementer` (one for small, one per task for large; `sw-spec-checker` only on concerns) |
+| `/sw:build` | Tiered TDD via parallel `sw-implementer`s — every task in a wave runs at once, orchestrator commits per task; `sw-spec-checker` only on concerns |
 | `/sw:debug` | Root cause first: reproduce → trace → one hypothesis at a time → failing test → fix |
 | `/sw:verify` | The local gate, with a temporary, guarded auth bypass for smoke tests |
 | `/sw:review` | `sw-reviewer` (Sonnet for small, Opus for large/security) against design + plan; how to receive feedback |

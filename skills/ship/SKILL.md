@@ -18,8 +18,8 @@ Read just enough code to size the task (codegraph / Grep, not whole files), then
 | Size | When | Flow |
 |---|---|---|
 | tiny | ≤ ~20 lines, one file, no schema/API/contract change, intent obvious | branch in place → edit → verify(fast) → llms-txt → pr |
-| small | one module, no new data model, ≤ ~5 tasks | discover(code) → architect(light) → plan → worktree → build(one implementer) → verify(lean) → review(Sonnet) → llms-txt → pr → verify-dev |
-| large | new model/migration, API contract change, cross-module, concurrency/cache/security impact, or > 5 tasks | all stages, research included, plan red-team, one implementer per task, review(Opus) |
+| small | one module, no new data model, ≤ ~5 tasks | discover(code) → architect(light) → plan → worktree → build(parallel waves) → verify(lean) → review(Sonnet) → llms-txt → pr → verify-dev |
+| large | new model/migration, API contract change, cross-module, concurrency/cache/security impact, or > 5 tasks | all stages, research included, plan red-team, parallel implementers per wave, parallel review lenses (Opus) |
 
 User flags override. State the size and one-line reason, then continue (no confirmation needed).
 Track progress: `node $SW/state.cjs set slug=<slug> size=<size> stage=<stage>` at the start of each stage (in the main checkout until the worktree exists, then in the worktree).
@@ -56,7 +56,10 @@ Everything else: decide, then append to `plan.md` → `## Rulings`: `Ruling: <de
 ## 4. Model routing
 The main thread (usually Opus) does judgment: triage, architect, plan, orchestration, Rulings. Code writing, command running and template filling go to subagents on cheaper models — see each stage. Use the Agent tool's `model` override where a stage says so; never upgrade a subagent's model without a reason recorded as a Ruling.
 
-## 5. Context discipline
+## 5. Parallel by default
+Speed comes from concurrency. Whenever two pieces of work don't depend on each other, dispatch them as multiple Agent calls **in one message** (same tool-use block) — never one agent per turn. Applies to scouts/researchers (discover), implementers per wave (build), spec-checkers, reviewer lenses (review), and verify's independent checks. Run independent Bash checks as parallel tool calls too. Serial only when one result feeds the next, or tasks touch the same files — record that as a Ruling.
+
+## 6. Context discipline
 - Subagents get exactly the context they need (file paths, the task text) — never your history.
 - Ask subagents for short reports; read their files only when needed.
 - Never paste large logs into the conversation; summarize the failing part.

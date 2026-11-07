@@ -15,6 +15,12 @@ List every file to create/modify and its single responsibility. Follow existing 
 ## 2. Tasks
 A task = the smallest unit with its own test cycle that a reviewer could reject independently. Fold setup/config/docs into the task that needs them.
 
+**Design for parallelism** — build dispatches every task of a wave concurrently, so plan speed = number of waves, not tasks:
+- Give each task a disjoint file set. Split by module/endpoint/component so tasks don't share files.
+- Pull shared edits (schema + migration + codegen, deps, shared types/contracts, module registration, barrel files) into one early foundation task; later tasks only depend on it.
+- Each task states `Depends` (task IDs it needs merged first) — keep it minimal; a test can stub a sibling's interface from the plan instead of waiting for it.
+- At most one task per wave runs a DB-resetting integration suite.
+
 ```markdown
 # Plan: <task>
 **Design:** docs/specs/<YYMMDD>-<slug>/design.md · **Size:** small|large · **Base:** <branch>
@@ -24,12 +30,18 @@ A task = the smallest unit with its own test cycle that a reviewer could reject 
 
 ## Tasks
 ### T1: <name>
-- Files: `src/...` (modify), `src/....spec.ts` (create)
+- Files: `src/...` (modify), `src/....spec.ts` (create)   ← exact and complete; parallel lanes may touch only these
+- Depends: — | T1, T2
 - Interface: `functionName(arg: Type): Promise<Result>` / `POST /v1/x {body} → 201 {shape} | 409 ERR_X`
 - TDD: <test-first|integration|none> (see tiers)
 - Tests: `it('rejects refund when order already refunded')`, … (names = behaviors)
 - Done when: `<exact command>` passes
 - [ ] write failing test · [ ] run (red) · [ ] implement · [ ] run (green) · [ ] commit
+
+## Waves
+- W1 (serial): T1 — foundation (migration, shared types)
+- W2 (parallel): T2, T3, T4 — disjoint files, depend only on T1
+- W3 (parallel): T5, T6
 
 ## Verify
 lint · typecheck · unit · integration (coverage ≥ 80% changed files) · build · dev server · smoke: <endpoints + cases> · playwright: <flows, frontend only>
@@ -50,7 +62,7 @@ Include real values from the design (field names, error codes, limits). Code sni
 Re-read the plan as three hostile reviewers, fix what they find, note it under Rulings:
 - **Breaker** — races, partial failure, retries, null/empty/huge inputs, timezones, money rounding.
 - **Operator** — migration on a big table, lock time, rollback, missing logs/metrics, config drift.
-- **Skeptic** — YAGNI: what can be cut; tasks too big to review; hidden coupling between tasks.
+- **Skeptic** — YAGNI: what can be cut; tasks too big to review; hidden coupling between tasks; two tasks in one wave that share a file (move the shared edit to a foundation task).
 
 ## 4. Gate 2
-Show: task list (one line each), verify plan, open risks. ⛔ Wait for approval. After approval execution is continuous — say so.
+Show: task list (one line each), waves (`W2: T2‖T3‖T4`), verify plan, open risks. ⛔ Wait for approval. After approval execution is continuous — say so.
