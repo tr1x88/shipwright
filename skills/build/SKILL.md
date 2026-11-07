@@ -1,6 +1,6 @@
 ---
 name: build
-description: Build stage — executes the approved plan with tiered TDD via sw-implementer (Sonnet): one agent for a small plan, one per task for large ones.
+description: Build stage — executes the approved plan with tiered TDD via sw-implementer (Sonnet), dispatching every independent task of a wave in parallel (one message, many agents).
 ---
 
 # Build
@@ -15,24 +15,41 @@ Run continuously until all tasks are done. Record decisions as Rulings in `plan.
 - A test that passes on first run proves nothing — make it fail first (or temporarily break the code) to show it can.
 
 ## Tests per task
-Run only the focused tests (red → green) and the touched module's tests before each checkpoint commit. Never run the full suite per task — `/sw:verify` runs it once.
+Run only the focused tests (red → green) and the touched module's tests. Never run the full suite per task — `/sw:verify` runs it once.
 
-The main thread orchestrates; it does not write the code (Opus output is the slowest, most expensive part of the flow).
+The main thread orchestrates; it does not write the code (Opus output is the slowest, most expensive part of the flow). Tiny edits (a few lines) it may still do inline.
 
-## Small → one implementer
-Write one brief `<wt>/.sw/tasks/plan.md` with all tasks, the design contracts and test commands. Dispatch ONE `sw-implementer` with the worktree path, brief path and report path `<wt>/.sw/tasks/plan.report.md`; it does the tasks in order with a checkpoint commit each. Then `git log --oneline` + `git diff --stat` to confirm. Tiny edits (a few lines) the main thread may still do inline.
+## Parallel by default — waves
+The plan's `## Waves` section groups tasks: tasks in one wave have no `Depends` on each other and **disjoint `Files`**. Default is parallel; serial is the exception that needs a reason.
+- Plan has no waves (older plan)? Derive them now from `Depends` + `Files` and record a Ruling.
+- A wave of one task → one implementer. A small plan whose tasks all overlap → one implementer for the whole plan (brief `<wt>/.sw/tasks/plan.md`).
 
-## Large → subagents
-For each task, sequentially (tasks share files — never run implementers in parallel):
-1. Write the brief to `<wt>/.sw/tasks/T<n>.md`: task text from the plan, relevant design excerpts (contracts, error codes), file paths, patterns to follow, test commands.
-2. Dispatch `sw-implementer` with: worktree path, brief path, report path `<wt>/.sw/tasks/T<n>.report.md`. It returns ≤ 15 lines: status, commits, test summary, concerns.
-3. Status `DONE` → next task. No per-task spec check: the whole-branch `/sw:review` covers spec compliance once.
-4. Status `DONE_WITH_CONCERNS` → dispatch `sw-spec-checker` (brief path, base SHA before the task, head SHA). Gaps → resume the implementer with the list (max 1 fix round); still failing → fix it yourself.
-5. Status `BLOCKED`/`NEEDS_CONTEXT` → supply context or split the task; never let it guess.
-Do not trust reports blindly: `git log --oneline -3` and `git diff --stat` after each task.
+For each wave, in order:
+1. Write one brief per task to `<wt>/.sw/tasks/T<n>.md`: task text, design excerpts (contracts, error codes), its exact file list, patterns to follow, test commands, and the line `Mode: parallel — do not commit; touch only the files listed`.
+2. Record `WAVE_BASE=$(git rev-parse HEAD)`.
+3. Dispatch **every task of the wave in ONE message** — one `sw-implementer` Agent call per task, all in the same tool-use block so they run concurrently. Each gets: worktree path, brief path, report path `<wt>/.sw/tasks/T<n>.report.md`. Never send them one per message.
+4. When all return, commit each task's files in task order (the orchestrator is the only writer to git during a wave):
+   `cd <wt> && git add -- <T<n> files> && git commit -m "<conventional subject>"`
+   Then `git status --porcelain` must be empty — a stray file means an implementer left its lane: assign it to its task or revert it.
+5. Status handling (after the commits):
+   - `DONE` → done. No per-task spec check: `/sw:review` covers spec compliance once.
+   - `DONE_WITH_CONCERNS` → dispatch all needed `sw-spec-checker`s in ONE message (brief path, `WAVE_BASE`, HEAD). Gaps → resume that implementer (max 1 fix round); still failing → fix it yourself.
+   - `BLOCKED` / `NEEDS_CONTEXT` → supply context or split the task; never let it guess. Other tasks of the wave keep their results.
+6. Run the touched modules' tests once for the whole wave (catches cross-task breakage), then start the next wave.
+
+Lane rules for parallel implementers (they are in the brief, repeat them if resuming):
+- Edit only the listed files. Need another file (shared barrel/index, module registration, lockfile)? Stop with `NEEDS_CONTEXT` — the orchestrator does the shared edit after the wave.
+- No `git add/commit/stash/checkout/reset`, no dependency installs, no migrations, no codegen (`prisma generate`) — those belong to a serial wave.
+- A failing compile/test in a file outside your list is another lane's work in progress: re-run once it settles; never edit it.
+- DB-resetting integration suites: the plan puts at most one per wave; otherwise run only your focused spec file.
+
+Do not trust reports blindly: `git log --oneline -<n>` and `git diff --stat $WAVE_BASE` after each wave.
+
+## Serial waves
+Shared foundations go in their own wave before the parallel ones: schema/migration + codegen, dependency changes, shared types/contracts, module wiring that every task imports. One implementer in normal mode (it commits itself).
 
 ## Commits
-Checkpoint commit per task, conventional style (`feat(orders): add refund endpoint`). They are squashed to 1–3 commits before the PR.
+One checkpoint commit per task, conventional style (`feat(orders): add refund endpoint`). They are squashed to 1–3 commits before the PR.
 
 ## Done when
 Every task is checked off, the touched modules' tests are green, and `node $SW/state.cjs set stage=verify` → `/sw:verify`.

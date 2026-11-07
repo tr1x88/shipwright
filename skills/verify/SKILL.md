@@ -10,6 +10,8 @@ Run in the worktree. Commands come from `CLAUDE.local.md` → Commands. `SW=~/.c
 This is the one place the full suite runs. Large tasks: dispatch `sw-verifier` with the worktree path, commands, base branch and the plan's Verify section — `model: haiku` for the report-only run, `model: sonnet` when dispatching it in fix mode; it returns the table below. Small/tiny: run inline.
 
 ## Pipeline (stop at the first failing step, fix, re-run from that step)
+Run independent steps concurrently: 1–3 (lint, typecheck, unit) as parallel Bash calls in one message (or `run_in_background` + wait); start the dev server (7) in the background while 4–6 run. Report the lowest-numbered failure first.
+
 | # | Step | Pass condition |
 |---|---|---|
 | 1 | lint / format | 0 errors (auto-fix flags allowed: `--fix`, `gofmt -w`) |

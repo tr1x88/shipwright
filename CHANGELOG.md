@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 — 2026-11-07
+Parallel agents by default.
+- Plan: tasks declare exact `Files` and `Depends`, grouped into `## Waves`; shared edits move to a serial foundation task so later tasks run concurrently. Red-team checks for same-wave file overlap.
+- Build: every task of a wave is dispatched in ONE message (many `sw-implementer`s at once) for small and large plans; parallel lanes edit only their files and don't touch git, the orchestrator commits per task. Spec-checkers also fan out.
+- `sw-implementer`: parallel mode (lane rules, reports changed files).
+- Discover: one `sw-scout` per area plus researchers, all in one message.
+- Verify: lint, typecheck and unit run concurrently; dev server boots in the background.
+- Review: one reviewer per lens in parallel for large/multi-lens branches; llms.txt docs-writer runs alongside review.
+- Ship: "parallel by default" rule for every stage.
+
 ## 0.3.0 — 2026-11-05
 Faster flow, cheaper model routing.
 - Architect interview batches up to 4 independent questions per prompt (≤ 3 prompts instead of ~10).
