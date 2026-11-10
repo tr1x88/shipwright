@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Planning stage — turns an approved design into bite-sized, test-first tasks with exact files, signatures and tests, red-teams large plans, and gets approval (Gate 2). Use after architect.
+description: Planning stage — turns an approved design into bite-sized, test-first tasks with exact files, signatures and tests, gets a fresh-context goldfish review, and gets approval (Gate 2). Use after architect.
 ---
 
 # Plan
@@ -58,11 +58,12 @@ If design.md has a `## Threat model`, every H/M threat's mitigation becomes a te
 
 Include real values from the design (field names, error codes, limits). Code snippets only where an interface or tricky logic must be exact.
 
-## 3. Red-team (large only)
-Re-read the plan as three hostile reviewers, fix what they find, note it under Rulings:
-- **Breaker** — races, partial failure, retries, null/empty/huge inputs, timezones, money rounding.
-- **Operator** — migration on a big table, lock time, rollback, missing logs/metrics, config drift.
-- **Skeptic** — YAGNI: what can be cut; tasks too big to review; hidden coupling between tasks; two tasks in one wave that share a file (move the shared edit to a foundation task).
+## 3. Goldfish review
+Just before Gate 2, dispatch `sw-goldfish` with absolute doc paths, no chat history and no research.md:
+- **small** → one agent: `docs: design.md, plan.md`, `lenses: comprehension, readiness`.
+- **large** → two agents in ONE message: `readiness` and `red-team`, each on `plan.md` with design.md as `context:`.
+
+Resolve findings per `${CLAUDE_PLUGIN_ROOT}/skills/review/references/resolve.md`. Note contests and escalations under Rulings. Any fix to the already-approved design.md is listed at Gate 2 for re-approval.
 
 ## 4. Gate 2
-Show: task list (one line each), waves (`W2: T2‖T3‖T4`), verify plan, open risks. ⛔ Wait for approval. After approval execution is continuous — say so.
+Show: task list (one line each), waves (`W2: T2‖T3‖T4`), verify plan, open risks, the goldfish summary lines (Fresh reader, Goldfish) and escalated questions. ⛔ Wait for approval. After approval execution is continuous — say so.

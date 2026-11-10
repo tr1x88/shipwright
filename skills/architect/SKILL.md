@@ -53,4 +53,6 @@ Write `<main>/.sw/specs/<slug>/design.md` (serves as the ADR):
 ```
 Small tasks: Decision, Contracts, Test strategy only.
 
+**Goldfish (large only).** After writing design.md, dispatch in ONE message two `sw-goldfish` (`docs:` the absolute path of design.md; lenses `comprehension` and `zoom-out`, one agent each). Give them no chat history and no research.md. Resolve findings per `${CLAUDE_PLUGIN_ROOT}/skills/review/references/resolve.md`; add its two gate-summary lines (Fresh reader, Goldfish) to the summary and put escalated questions in the approval ask. Small: skip (its single pass runs in /sw:plan).
+
 Show a ≤ 15-line summary and ask for approval. ⛔ Do not plan until approved; apply requested changes and re-ask.

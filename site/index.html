@@ -80,7 +80,7 @@
     <div class="flow">
       <div class="step"><h4>discover</h4><p>Code map via CodeGraph. Parallel research: context7 docs, current practices, real repos.</p></div>
       <div class="step gate"><h4>architect</h4><p>One question at a time: data model, contracts, races, cache, authz, rollout.</p></div>
-      <div class="step gate"><h4>plan</h4><p>Exact files, signatures and named tests. Red-teamed when large.</p></div>
+      <div class="step gate"><h4>plan</h4><p>Exact files, signatures and named tests. Reviewed by a fresh-context goldfish.</p></div>
       <div class="step"><h4>worktree</h4><p><code>.worktree/</code> with its own DB, Redis db and port.</p></div>
       <div class="step"><h4>build</h4><p>Tiered TDD, with one subagent per task on large work.</p></div>
       <div class="step"><h4>verify</h4><p>Lint → types → unit → integration → coverage → build → dev server → smoke → Playwright.</p></div>
@@ -121,7 +121,7 @@
       <table class="table">
         <tr><th></th><th>ClaudeKit</th><th>superpowers</th><th>Shipwright</th></tr>
         <tr><td>Context injected on every prompt</td><td>~3 KB</td><td>0</td><td class="hl">0</td></tr>
-        <tr><td>Always-loaded skill + agent descriptions</td><td>~27 K chars</td><td>~3 K chars</td><td class="hl">~4.4 K chars</td></tr>
+        <tr><td>Always-loaded skill + agent descriptions</td><td>~27 K chars</td><td>~3 K chars</td><td class="hl">~5.0 K chars</td></tr>
         <tr><td>Deep architecture interview</td><td>partial</td><td>✓</td><td class="hl">✓ 12-area checklist</td></tr>
         <tr><td>Web / docs / prior-art research</td><td>✓ (Gemini CLI)</td><td>—</td><td class="hl">✓ built-in, parallel</td></tr>
         <tr><td>Approval gates</td><td>every step</td><td>design + plan</td><td class="hl">design + plan</td></tr>

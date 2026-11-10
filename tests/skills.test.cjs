@@ -25,6 +25,10 @@ test('threat-model skill is present', () => {
   assert.ok(skills.includes('threat-model'));
 });
 
+test('drift skill is present', () => {
+  assert.ok(skills.includes('drift'));
+});
+
 for (const name of skills) {
   test(`${name}: name matches directory and description exists`, () => {
     const fm = frontmatter(read(name));
