@@ -24,13 +24,11 @@ In the same message dispatch `sw-docs-writer` for `/sw:llms-txt` (worktree, base
 It returns findings as `Critical | Important | Minor` with file:line, why, and a suggested fix.
 
 ## Act on findings
+Classify and resolve every finding per [resolve.md](references/resolve.md) (FIX / CONTEST / ESCALATE / DECLINE).
 - **Critical / Important** → fix now (TDD for behavior changes), re-run the affected verify steps.
 - **Minor** → fix if trivial, otherwise list in the PR description under "Follow-ups".
 - Re-review only the fixed areas (cycle cap above); then decide and record a Ruling.
+- A lens reviewer that fails or returns nothing → retry once, then list it as `not run` in the PR body.
 
 ## Receiving feedback (from the reviewer, PR comments, or the user)
-1. Read it fully; restate the technical requirement in your own words if unclear — ask instead of guessing.
-2. Verify against the code before changing anything; reviewers can be wrong about context.
-3. YAGNI check: is the suggested "proper" feature actually used? (`grep` for callers.)
-4. Push back with evidence when it is wrong for this codebase; otherwise just fix it.
-5. No performative agreement ("Great point!"). State what you changed, or why not.
+Follow [resolve.md](references/resolve.md): read fully, verify against the code, YAGNI-check, push back only with checkable evidence, no performative agreement.
