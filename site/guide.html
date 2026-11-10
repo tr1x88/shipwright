@@ -118,7 +118,7 @@ POST /v1/auth/login {"email":"qa@example.com","password":"…"} → .accessToken
       <tr><th>Size</th><th>When</th><th>What runs</th></tr>
       <tr><td><b>tiny</b></td><td>≤ ~20 lines, one file, no schema/API change</td><td>branch in place → edit → quick verify → llms-txt → PR</td></tr>
       <tr><td><b>small</b></td><td>one module, no new data model, ≤ ~5 tasks</td><td>code scout → light architect → plan → worktree → parallel build → verify → review → llms-txt → PR → verify-dev</td></tr>
-      <tr><td><b>large</b></td><td>new model or migration, contract change, cross-module, concurrency/cache/security impact</td><td>everything, including parallel research, plan red-team, parallel build waves and parallel review lenses</td></tr>
+      <tr><td><b>large</b></td><td>new model or migration, contract change, cross-module, concurrency/cache/security impact</td><td>everything, including parallel research, goldfish review (comprehension, zoom-out, readiness, red-team), parallel build waves and parallel review lenses</td></tr>
     </table>
     <p>There are two gates (⛔): the <b>design</b> and the <b>plan</b>. After you approve the plan, Shipwright stops only for:</p>
     <ol>
@@ -156,7 +156,7 @@ POST /v1/auth/login {"email":"qa@example.com","password":"…"} → .accessToken
     <p>Next it lays out 2–3 approaches with their trade-offs and writes <code>design.md</code>, which doubles as the ADR. It does not plan until you approve.</p>
 
     <h2 id="plan">Plan</h2>
-    <p>The plan starts with a file map. Each task then lists exact files, interfaces, a TDD tier, named tests and a "done when" command. Large plans are red-teamed by three personas before you see them: the <em>Breaker</em> (races, partial failure), the <em>Operator</em> (migrations, rollback) and the <em>Skeptic</em> (what to cut). Drafts live in <code>.sw/specs/</code>, which is git-excluded, and move into <code>docs/specs/&lt;date&gt;-&lt;slug&gt;/</code> in the worktree so they ship with the PR.</p>
+    <p>The plan starts with a file map. Each task then lists exact files, interfaces, a TDD tier, named tests and a "done when" command. Before the gate, a fresh-context <code>sw-goldfish</code> (Sonnet, read-only) reads the design and plan cold, with no session history, and paraphrases them back. Small tasks get one goldfish (comprehension + readiness). Large tasks run comprehension and zoom-out on the design before Gate 1, then readiness and red-team on the plan before Gate 2, in parallel. The gate summary shows the "Fresh reader" paraphrase and a goldfish status: fixed, contested, escalated, declined or not run. A reviewer that fails twice is reported as <code>not run</code>, never as clean. The idea comes from <a href="https://github.com/google/elephant-goldfish-model">google/elephant-goldfish-model</a>. Drafts live in <code>.sw/specs/</code>, which is git-excluded, and move into <code>docs/specs/&lt;date&gt;-&lt;slug&gt;/</code> in the worktree so they ship with the PR.</p>
 
     <h2 id="worktree">Worktree</h2>
 <pre>node ~/.claude/shipwright/bin/wt.cjs create partial-refunds --prefix feat --size large</pre>
@@ -232,6 +232,9 @@ node ~/.claude/shipwright/bin/auth-bypass.cjs restore                      # alw
 <pre>/sw:cleanup partial-refunds</pre>
     <p>Once the base-branch PR is merged, cleanup drops the worktree DB, flushes its Redis db, removes the worktree and deletes the merged branch. It refuses if there are uncommitted or untracked files, unless you confirm with <code>--force</code>.</p>
 
+    <h2 id="drift">Spec drift: <code>/sw:drift</code></h2>
+    <p>Specs ship with each PR under <code>docs/specs/</code>, and code keeps moving. <code>/sw:drift</code> sends one fresh-context goldfish per spec to compare it with the current code and writes only the divergences — <em>missing</em>, <em>diverged</em> or <em>stale-doc</em> — to <code>.sw/drift/&lt;date&gt;.md</code>. It never edits code or docs.</p>
+
     <h2 id="debug">Debugging: <code>/sw:debug</code></h2>
     <p>Debugging works the same way whether you start it yourself or a verify step does: reproduce → trace backward to where the bad state is created → test one hypothesis at a time → write a failing test → fix → add a guard. After three failed hypotheses it steps back, or hands the evidence to <code>sw-debugger</code> for a fresh look. It has specific playbooks for type errors, CI-only failures, dev logs and performance (measure before and after).</p>
 
@@ -248,6 +251,7 @@ node ~/.claude/shipwright/bin/auth-bypass.cjs restore                      # alw
       <tr><td>sw-implementer · sw-spec-checker</td><td>Sonnet</td><td>plan tasks with TDD · diff vs brief (on concerns)</td></tr>
       <tr><td>sw-verifier · sw-docs-writer</td><td>Haiku / Sonnet</td><td>verify report / fix mode · PR body / llms.txt</td></tr>
       <tr><td>sw-debugger</td><td>Sonnet</td><td>root cause</td></tr>
+      <tr><td>sw-goldfish</td><td>Sonnet</td><td>fresh-context reader: comprehension, zoom-out, readiness, red-team, drift</td></tr>
       <tr><td>sw-reviewer</td><td>Sonnet / Opus</td><td>whole-branch review (small / large, security)</td></tr>
     </table>
 

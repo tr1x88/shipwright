@@ -205,3 +205,9 @@ Node script, < 50ms, git info cached 5s. Two lines, degrades to one on narrow te
 ## 10. Decisions
 - No `MISTAKE.md` integration in the kit.
 - Existing agents untouched; kit ships its own 8 `sw-*` agents.
+
+## 11. v0.5 addendum: fresh-eyes review
+- `sw-goldfish` (Sonnet, read-only, fresh context) reads design and plan cold and paraphrases them back; lenses: comprehension, zoom-out, readiness, red-team, drift. Adapted from google/elephant-goldfish-model.
+- Small: one goldfish (comprehension + readiness) before Gate 2 (mandatory subagents per small task: 3). Large: comprehension and zoom-out before Gate 1, readiness and red-team before Gate 2, replacing the in-thread plan red-team of section 5.
+- Findings are resolved by `skills/review/references/resolve.md` (FIX/CONTEST/ESCALATE/DECLINE). A failed parallel reviewer is retried once, then `not run`.
+- `/sw:drift` runs one goldfish per spec against current code, report-only (`.sw/drift/<date>.md`).

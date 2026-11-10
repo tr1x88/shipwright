@@ -23,13 +23,13 @@ It asks the hard architecture questions first, then works through to a verified 
 
 AI coding sessions usually fail in one of two ways. Some charge ahead on assumptions. Others stop every two minutes to ask "should I continue?". Shipwright puts **all the questioning up front**, where answers are cheap, and gets them from a structured architecture interview backed by real research. After you approve the plan it **runs to the pull request without pausing**, with evidence at every step: tests written first, a coverage gate, a real dev-server API smoke test, a Playwright run and a senior review.
 
-It merges the discipline of [obra/superpowers](https://github.com/obra/superpowers) (brainstorm → plan → subagent TDD → verification) with the practical tooling of ClaudeKit (hooks, worktree scripts, plan red-teaming). It then adds what both of them lack: isolated databases per worktree, API smoke tests against a running server, post-deploy checks and an `llms.txt` sync. It is also built for **token efficiency**.
+It merges the discipline of [obra/superpowers](https://github.com/obra/superpowers) (brainstorm → plan → subagent TDD → verification) with the practical tooling of ClaudeKit (hooks, worktree scripts, plan red-teaming). Its fresh-eyes doc review is adapted from [google/elephant-goldfish-model](https://github.com/google/elephant-goldfish-model). It then adds what both of them lack: isolated databases per worktree, API smoke tests against a running server, post-deploy checks and an `llms.txt` sync. It is also built for **token efficiency**.
 
 | | Typical kit | **Shipwright** |
 |---|---|---|
 | Per-prompt context injection | ~3 KB every message | **0** |
-| Always-loaded skill + agent descriptions | ~27 K chars | **~4.4 K chars** |
-| Mandatory subagents per task | 5–6 | **0 (tiny) · 2 (small)** |
+| Always-loaded skill + agent descriptions | ~27 K chars | **~5.0 K chars** |
+| Mandatory subagents per task | 5–6 | **0 (tiny) · 3 (small)** |
 | Approval gates | every step | **2 (design, plan)** |
 | Worktree DB / Redis isolation | — | **✓ cloned per worktree** |
 | Real API smoke test + post-deploy check | — | **✓** |
@@ -67,8 +67,9 @@ git clone https://github.com/jamesngdev/shipwright && cd shipwright
         └─ small / large
              1 discover     code map (+ docs, best practices, prior art for large)
              2 architect ⛔  batched interview (≤ 4 questions per prompt) → 2–3 approaches → design.md
+                            (large: fresh-reader goldfish check of the design before the gate)
                             (+ threat model for large / security-sensitive tasks)
-             3 plan      ⛔  file map + test-first tasks (+ red-team for large)
+             3 plan      ⛔  file map + test-first tasks, goldfish-reviewed (readiness + red-team lenses for large)
              ─── approved: runs continuously from here ───
              4 worktree     .worktree/feat-<slug> + own DB, Redis db, port
              5 build        tiered TDD · 1 Sonnet implementer (small) or 1 per task (large)
@@ -97,18 +98,19 @@ Every other decision is made on the spot and logged in `plan.md` as `Ruling: <de
 | `/sw:ship <task>` | The whole flow. `--tiny` / `--small` / `--large` to force a size, `--resume` to continue |
 | `/sw:discover` | Parallel scouts + parallel research (context7 docs, web, `gh search code`) → `research.md` |
 | `/sw:architect` | Architecture interview: data model, API contract, consistency, idempotency, concurrency, cache, authz, failure modes, performance, observability, rollout → `design.md` |
-| `/sw:plan` | Exact files, dependencies and named tests per task, grouped into parallel waves; red-team for large plans → `plan.md` |
+| `/sw:plan` | Exact files, dependencies and named tests per task, grouped into parallel waves; goldfish-reviewed (readiness; plus red-team for large) → `plan.md` |
 | `/sw:worktree` · `/sw:cleanup` | Isolated workspace with its own DB/Redis/port · teardown |
 | `/sw:build` | Tiered TDD via parallel `sw-implementer`s — every task in a wave runs at once, orchestrator commits per task; `sw-spec-checker` only on concerns |
 | `/sw:debug` | Root cause first: reproduce → trace → one hypothesis at a time → failing test → fix |
 | `/sw:verify` | The local gate, with a temporary, guarded auth bypass for smoke tests |
 | `/sw:review` | `sw-reviewer` (Sonnet for small, Opus for large/security) against design + plan; how to receive feedback |
+| `/sw:drift` | One fresh-context `sw-goldfish` per spec in `docs/specs` vs current code → `.sw/drift/<date>.md`, report-only |
 | `/sw:llms-txt` | Sync `llms.txt` + topic files ([llmstxt.org](https://llmstxt.org)); `audit` mode for drift |
 | `/sw:pr` | Squash, SSH identity, dual PR, integration branch on conflict |
 | `/sw:verify-dev` | Post-deploy smoke on dev; feature bugs are auto-fixed for up to 2 rounds |
 | `/sw:node-backend` · `/sw:go` · `/sw:frontend` | Stack knowledge packs, loaded only when relevant |
 
-**Agents** (model + effort pinned, overridden per call where it pays): `sw-scout` and `sw-researcher` (Haiku, low effort) · `sw-implementer`, `sw-spec-checker`, `sw-debugger` (Sonnet) · `sw-verifier` (Haiku report-only, Sonnet fix mode) · `sw-docs-writer` (Sonnet llms.txt, Haiku PR body) · `sw-reviewer` (Sonnet small, Opus large/security). The main thread only does judgment work; full test suite runs once, in verify.
+**Agents** (model + effort pinned, overridden per call where it pays): `sw-scout` and `sw-researcher` (Haiku, low effort) · `sw-implementer`, `sw-spec-checker`, `sw-debugger` (Sonnet) · `sw-verifier` (Haiku report-only, Sonnet fix mode) · `sw-docs-writer` (Sonnet llms.txt, Haiku PR body) · `sw-reviewer` (Sonnet small, Opus large/security) · `sw-goldfish` (Sonnet, read-only, fresh-context reader of design and plan). The main thread only does judgment work; full test suite runs once, in verify.
 
 ## Tiered TDD
 
@@ -149,8 +151,8 @@ node ~/.claude/shipwright/bin/wt.cjs create order-refund --prefix feat
 
 ```text
 .claude-plugin/   plugin + marketplace manifests
-skills/           16 workflow skills + 3 stack packs (references load on demand)
-agents/           8 sw-* agents
+skills/           17 workflow skills + 3 stack packs (references load on demand)
+agents/           9 sw-* agents
 bin/              hooks, wt.cjs, auth-bypass, coverage gate, statusline, installer lib
 tests/            node:test suites (worktree tests use real Postgres + Redis)
 site/             GitHub Pages website

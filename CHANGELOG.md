@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 — 2026-11-10
+Fresh-eyes doc review (from google/elephant-goldfish-model).
+- New `sw-goldfish` agent (Sonnet, read-only, fresh context): lenses comprehension, zoom-out, readiness, red-team, drift; replies with a paraphrase first.
+- Plan red-team becomes goldfish lenses: small = one goldfish on design+plan before Gate 2; large = comprehension and zoom-out on the design, readiness and red-team on the plan, in parallel.
+- Gate summary shows "Fresh reader" and a goldfish status (fixed/contested/escalated/declined/not run).
+- `skills/review/references/resolve.md`: FIX/CONTEST/ESCALATE/DECLINE rules for any reviewer's findings.
+- A failed parallel reviewer is retried once, then reported `not run`, never clean.
+- New `/sw:drift`: one goldfish per spec vs current code, report-only to `.sw/drift/<date>.md`.
+- `tests/agents.test.cjs` lints agent frontmatter.
+
 ## 0.4.0 — 2026-11-07
 Parallel agents by default.
 - Plan: tasks declare exact `Files` and `Depends`, grouped into `## Waves`; shared edits move to a serial foundation task so later tasks run concurrently. Red-team checks for same-wave file overlap.
