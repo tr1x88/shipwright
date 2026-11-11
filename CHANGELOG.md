@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.1 — 2026-11-11
+- `/sw:verify-dev` is opt-in: `/sw:ship` and `/sw:pr` stop after the PRs (`stage=done`) and never start it automatically; run it only when the user asks. Session-start hint, managed CLAUDE.md block, README, site and manifests updated.
+
 ## 0.5.0 — 2026-11-10
 Fresh-eyes doc review (from google/elephant-goldfish-model).
 - New `sw-goldfish` agent (Sonnet, read-only, fresh context): lenses comprehension, zoom-out, readiness, red-team, drift; replies with a paraphrase first.

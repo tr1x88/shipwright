@@ -6,7 +6,7 @@
   <title>Shipwright — research-first, test-driven Claude Code workflow</title>
   <meta name="description" content="Shipwright is a Claude Code plugin that asks the hard architecture questions first, then ships to a verified pull request without stopping — worktrees with their own database, tiered TDD, real API smoke tests and post-deploy checks.">
   <meta property="og:title" content="Shipwright — ask hard questions first, then ship without stopping">
-  <meta property="og:description" content="Research → architect → plan → worktree → TDD → verify → review → llms.txt → PR → verify on dev. A lean Claude Code plugin for backend and frontend teams.">
+  <meta property="og:description" content="Research → architect → plan → worktree → TDD → verify → review → llms.txt → PR. A lean Claude Code plugin for backend and frontend teams.">
   <meta property="og:image" content="https://jamesngdev.github.io/shipwright/icon.png">
   <link rel="icon" href="logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -87,7 +87,7 @@
       <div class="step"><h4>review</h4><p>One whole-branch pass (Sonnet for small, Opus for large) with security and performance lenses.</p></div>
       <div class="step"><h4>llms-txt</h4><p>Client-facing docs synced with every feature.</p></div>
       <div class="step"><h4>pr</h4><p>1–3 commits. PR → base (kept open) and PR → develop.</p></div>
-      <div class="step"><h4>verify-dev</h4><p>After merge and deploy, a smoke test on the dev domain, with logs on failure.</p></div>
+      <div class="step"><h4>verify-dev <small>(opt-in)</small></h4><p>Only when you ask: after merge and deploy, a smoke test on the dev domain, with logs on failure.</p></div>
     </div>
     <div class="flow-note"><span class="pill">continuous</span> After the plan is approved, the only stops are destructive actions, security-sensitive steps, shared side effects (merge, push, deploy), a broken plan, or failed retries.</div>
   </div>

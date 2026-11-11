@@ -26,7 +26,7 @@ const BLOCK = `${START}
 
 - Feature or bug-fix work → \`/sw:ship <task>\`. Questions, explanations and exploration → answer directly.
 - After the plan is approved, run to the PR without check-ins; stop only for destructive, security-sensitive or shared-side-effect actions (merge, push to shared branches, deploy), a broken plan, or failing verification after the retry budget.
-- Every feature: verify (lint → typecheck → unit → integration, ≥80% coverage on changed files → build → dev server → API smoke → Playwright for frontend) → review → \`/sw:llms-txt\` → \`/sw:pr\` → \`/sw:verify-dev\`.
+- Every feature: verify (lint → typecheck → unit → integration, ≥80% coverage on changed files → build → dev server → API smoke → Playwright for frontend) → review → \`/sw:llms-txt\` → \`/sw:pr\`. \`/sw:verify-dev\` (smoke on dev) runs only when the user asks — never automatically.
 - Branches: start from the root worktree's branch (else \`master\`), never from \`develop\`. Non-tiny work happens in \`.worktree/\` via \`/sw:worktree\`.
 - PRs: PR to the base branch (kept open, never auto-merged) + PR to \`develop\`; on conflict use \`integration/<branch>\` cut from develop. Never merge \`develop\`/\`master\` into a feature branch; rebase onto the base instead.
 - Commits: 1–3 per ticket (squash checkpoints before the first push). Never force-push shared branches, never push to master/main/develop directly, never merge.

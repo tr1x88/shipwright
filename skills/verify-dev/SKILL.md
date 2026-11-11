@@ -1,12 +1,12 @@
 ---
 name: verify-dev
-description: Post-deploy check on dev — after the develop PR is merged and the user confirms the deploy, smoke-tests changed endpoints on the dev domain; reads logs on failure.
+description: Opt-in post-deploy check on dev, run only when the user asks — after the develop PR is merged and the user confirms the deploy, smoke-tests changed endpoints on the dev domain; reads logs on failure.
 argument-hint: "[pr-number]"
 ---
 
 # Verify on dev
 
-The kit never merges. Dev domain, health path and dev auth come from `CLAUDE.local.md`; the logs MCP from `~/.claude/shipwright/config.json` → `logsMcp`.
+Opt-in: never part of `/sw:ship`'s automatic flow; run only when the user explicitly asks. The kit never merges. Dev domain, health path and dev auth come from `CLAUDE.local.md`; the logs MCP from `~/.claude/shipwright/config.json` → `logsMcp`.
 
 ## 1. Wait for the merge
 PR = the develop PR from `/sw:pr` (or the argument). Check: `gh pr view <n> --json state,mergedAt,mergeCommit`.

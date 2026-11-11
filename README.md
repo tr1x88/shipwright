@@ -78,8 +78,9 @@ git clone https://github.com/jamesngdev/shipwright && cd shipwright
              7 review       one whole-branch review: Sonnet (small) / Opus (large, security)
              8 llms-txt     client-facing docs synced (every feature)
              9 pr           1–3 commits · PR → base (kept open) + PR → develop
-            10 verify-dev   after merge + your "deployed": smoke on the dev domain, logs on failure
-            11 cleanup      drop worktree, DB and Redis db
+            10 cleanup      drop worktree, DB and Redis db
+
+           opt-in    /sw:verify-dev — only when you ask: smoke on the dev domain after merge + deploy
 ```
 
 After the plan is approved, Shipwright stops only for the following:
@@ -107,7 +108,7 @@ Every other decision is made on the spot and logged in `plan.md` as `Ruling: <de
 | `/sw:drift` | One fresh-context `sw-goldfish` per spec in `docs/specs` vs current code → `.sw/drift/<date>.md`, report-only |
 | `/sw:llms-txt` | Sync `llms.txt` + topic files ([llmstxt.org](https://llmstxt.org)); `audit` mode for drift |
 | `/sw:pr` | Squash, SSH identity, dual PR, integration branch on conflict |
-| `/sw:verify-dev` | Post-deploy smoke on dev; feature bugs are auto-fixed for up to 2 rounds |
+| `/sw:verify-dev` | Opt-in, never run automatically: post-deploy smoke on dev; feature bugs are auto-fixed for up to 2 rounds |
 | `/sw:node-backend` · `/sw:go` · `/sw:frontend` | Stack knowledge packs, loaded only when relevant |
 
 **Agents** (model + effort pinned, overridden per call where it pays): `sw-scout` and `sw-researcher` (Haiku, low effort) · `sw-implementer`, `sw-spec-checker`, `sw-debugger` (Sonnet) · `sw-verifier` (Haiku report-only, Sonnet fix mode) · `sw-docs-writer` (Sonnet llms.txt, Haiku PR body) · `sw-reviewer` (Sonnet small, Opus large/security) · `sw-goldfish` (Sonnet, read-only, fresh-context reader of design and plan). The main thread only does judgment work; full test suite runs once, in verify.
