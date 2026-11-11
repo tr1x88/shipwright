@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Use for any feature or bug-fix implementation request. Runs the Shipwright flow end to end — triage, research, architect, plan, worktree, TDD build, verify, review, llms.txt, PR, verify on dev.
+description: Use for any feature or bug-fix implementation request. Runs the Shipwright flow end to end — triage, research, architect, plan, worktree, TDD build, verify, review, llms.txt, PR. Verify on dev only on request.
 argument-hint: "<task> [--tiny|--small|--large] [--resume]"
 ---
 
@@ -18,7 +18,7 @@ Read just enough code to size the task (codegraph / Grep, not whole files), then
 | Size | When | Flow |
 |---|---|---|
 | tiny | ≤ ~20 lines, one file, no schema/API/contract change, intent obvious | branch in place → edit → verify(fast) → llms-txt → pr |
-| small | one module, no new data model, ≤ ~5 tasks | discover(code) → architect(light) → plan → worktree → build(parallel waves) → verify(lean) → review(Sonnet) → llms-txt → pr → verify-dev |
+| small | one module, no new data model, ≤ ~5 tasks | discover(code) → architect(light) → plan → worktree → build(parallel waves) → verify(lean) → review(Sonnet) → llms-txt → pr |
 | large | new model/migration, API contract change, cross-module, concurrency/cache/security impact, or > 5 tasks | all stages, research included, goldfish design/plan review, parallel implementers per wave, parallel review lenses (Opus) |
 
 User flags override. State the size and one-line reason, then continue (no confirmation needed).
@@ -37,7 +37,8 @@ Track progress: `node $SW/state.cjs set slug=<slug> size=<size> stage=<stage>` a
 | 7 | review | `/sw:review` | — |
 | 8 | llms-txt | `/sw:llms-txt` | — |
 | 9 | pr | `/sw:pr` | — |
-| 10 | verify-dev | `/sw:verify-dev` | waits for merge + user's "deployed" |
+
+Not part of the automatic flow: `/sw:verify-dev` (post-deploy smoke on dev) runs only when the user asks for it.
 
 Artifacts: draft into `<main>/.sw/specs/<slug>/` (git-excluded) during stages 1–3; `/sw:worktree` moves them to `<worktree>/docs/specs/<YYMMDD>-<slug>/` so they ship with the PR.
 
@@ -49,7 +50,7 @@ Stop and ask ONLY for:
 2. a security-sensitive action (secrets, permissions, auth changes beyond the plan);
 3. a side effect outside the worktree that norms reserve for the user (merging, pushing to a shared branch, deploying, publishing);
 4. a plan so broken that every path forward is a guess;
-5. verify still failing after 3 fix rounds, or verify-dev after 2.
+5. verify still failing after 3 fix rounds.
 
 Everything else: decide, then append to `plan.md` → `## Rulings`: `Ruling: <decision> — <why> — <cost if wrong>`. Keep going.
 
@@ -65,4 +66,4 @@ Speed comes from concurrency. Whenever two pieces of work don't depend on each o
 - Never paste large logs into the conversation; summarize the failing part.
 
 ## 7. Finish
-After `/sw:pr`: report PR URLs, verify summary, rulings made. Then `/sw:verify-dev` polls for the merge. After it passes, remind the user that `/sw:cleanup <slug>` drops the worktree, DB and Redis db once the PR to the base branch is merged.
+After `/sw:pr`: report PR URLs, verify summary, rulings made, then `node $SW/state.cjs set stage=done` and stop. Do **not** run `/sw:verify-dev` unless the user asks for it — mention in one line that it is available. Remind the user that `/sw:cleanup <slug>` drops the worktree, DB and Redis db once the PR to the base branch is merged.

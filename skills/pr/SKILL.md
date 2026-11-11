@@ -53,4 +53,4 @@ git merge-tree --write-tree --name-only origin/develop HEAD >/dev/null 2>&1 && C
 PR #1 → <parent>: <url>   (keep open)
 PR #2 → develop:  <url>   [via integration/<branch>]
 ```
-`node ~/.claude/shipwright/bin/state.cjs set stage=verify-dev` → `/sw:verify-dev`.
+`node ~/.claude/shipwright/bin/state.cjs set stage=done`. Do not start `/sw:verify-dev` — it runs only when the user asks.

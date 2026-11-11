@@ -117,7 +117,7 @@ POST /v1/auth/login {"email":"qa@example.com","password":"…"} → .accessToken
     <table>
       <tr><th>Size</th><th>When</th><th>What runs</th></tr>
       <tr><td><b>tiny</b></td><td>≤ ~20 lines, one file, no schema/API change</td><td>branch in place → edit → quick verify → llms-txt → PR</td></tr>
-      <tr><td><b>small</b></td><td>one module, no new data model, ≤ ~5 tasks</td><td>code scout → light architect → plan → worktree → parallel build → verify → review → llms-txt → PR → verify-dev</td></tr>
+      <tr><td><b>small</b></td><td>one module, no new data model, ≤ ~5 tasks</td><td>code scout → light architect → plan → worktree → parallel build → verify → review → llms-txt → PR</td></tr>
       <tr><td><b>large</b></td><td>new model or migration, contract change, cross-module, concurrency/cache/security impact</td><td>everything, including parallel research, goldfish review (comprehension, zoom-out, readiness, red-team), parallel build waves and parallel review lenses</td></tr>
     </table>
     <p>There are two gates (⛔): the <b>design</b> and the <b>plan</b>. After you approve the plan, Shipwright stops only for:</p>
@@ -126,7 +126,7 @@ POST /v1/auth/login {"email":"qa@example.com","password":"…"} → .accessToken
       <li>security-sensitive actions;</li>
       <li>side effects outside the worktree that are yours to take (merge, push to shared branches, deploy, publish);</li>
       <li>a plan so broken that every way forward is a guess;</li>
-      <li>verification still failing after 3 rounds (or verify-dev after 2).</li>
+      <li>verification still failing after 3 rounds.</li>
     </ol>
     <p>Every other decision is made on the spot and logged in <code>plan.md</code>:</p>
 <pre>## Rulings
@@ -221,7 +221,7 @@ node ~/.claude/shipwright/bin/auth-bypass.cjs restore                      # alw
     </ul>
 
     <h2 id="verify-dev">Verify on dev</h2>
-    <p>Shipwright never merges. It checks the develop PR with <code>gh pr view</code>. After the merge, it asks you to confirm the deploy is live, then:</p>
+    <p><b>Opt-in.</b> <code>/sw:ship</code> stops after the PRs; run <code>/sw:verify-dev</code> yourself when you want this check. Shipwright never merges. It checks the develop PR with <code>gh pr view</code>. After the merge, it asks you to confirm the deploy is live, then:</p>
     <ul>
       <li>checks the health endpoint and the commit, if exposed;</li>
       <li>re-runs the smoke table on the dev domain with real auth from <code>CLAUDE.local.md</code>, adding 401/403 cases.</li>
