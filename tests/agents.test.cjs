@@ -38,3 +38,14 @@ test('sw-goldfish is present and read-only', () => {
   const tools = frontmatter('sw-goldfish.md').tools.split(',').map((t) => t.trim());
   for (const t of ['Edit', 'Write', 'NotebookEdit']) assert.ok(!tools.includes(t), `has ${t}`);
 });
+
+test('planning agents are pinned to opus and cannot edit code', () => {
+  for (const f of ['sw-designer.md', 'sw-planner.md']) {
+    assert.ok(agents.includes(f), `${f} missing`);
+    const fm = frontmatter(f);
+    assert.strictEqual(fm.model, 'opus');
+    const tools = fm.tools.split(',').map((t) => t.trim());
+    assert.ok(!tools.includes('Edit'), `${f} has Edit`);
+  }
+  assert.strictEqual(frontmatter('sw-goldfish.md').model, 'opus');
+});

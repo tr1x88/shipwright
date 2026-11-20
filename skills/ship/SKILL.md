@@ -55,7 +55,7 @@ Stop and ask ONLY for:
 Everything else: decide, then append to `plan.md` → `## Rulings`: `Ruling: <decision> — <why> — <cost if wrong>`. Keep going.
 
 ## 4. Model routing
-The main thread (usually Opus) does judgment: triage, architect, plan, orchestration, Rulings. Code writing, command running and template filling go to subagents on cheaper models — see each stage. Use the Agent tool's `model` override where a stage says so; never upgrade a subagent's model without a reason recorded as a Ruling.
+Planning is pinned to the strongest model regardless of the session model: `sw-designer` (design.md), `sw-planner` (plan.md), `sw-goldfish` on large tasks and `sw-reviewer` on large/security branches run on Opus. The main thread only interviews, gates, orchestrates and records Rulings, so a Sonnet session works. Code writing, command running and template filling go to subagents on Sonnet/Haiku — see each stage. Use the Agent tool's `model` override where a stage says so; never upgrade a subagent's model without a reason recorded as a Ruling.
 
 ## 5. Parallel by default
 Speed comes from concurrency. Whenever two pieces of work don't depend on each other, dispatch them as multiple Agent calls **in one message** (same tool-use block) — never one agent per turn. Applies to scouts/researchers (discover), implementers per wave (build), spec-checkers, reviewer lenses (review), and verify's independent checks. Run independent Bash checks as parallel tool calls too. Serial only when one result feeds the next, or tasks touch the same files — record that as a Ruling. A parallel agent that fails or returns nothing is retried once, then reported `not run` — never counted as a clean result.

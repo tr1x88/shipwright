@@ -7,7 +7,7 @@ description: Planning stage — turns an approved design into bite-sized, test-f
 
 Write for an engineer who has never seen this codebase: they write idiomatic code once they know the exact interface and the exact test. What they cannot know is what you decided — document that.
 
-Output: `<main>/.sw/specs/<slug>/plan.md`.
+Output: `<main>/.sw/specs/<slug>/plan.md`, written by `sw-planner` (pinned Opus) from the approved design.md; the main thread dispatches it, reviews the result and runs the gate. §1–2 below are its brief.
 
 ## 1. File map first
 List every file to create/modify and its single responsibility. Follow existing patterns; split by responsibility, not by layer. This locks decomposition.
@@ -60,8 +60,8 @@ Include real values from the design (field names, error codes, limits). Code sni
 
 ## 3. Goldfish review
 Just before Gate 2, dispatch `sw-goldfish` with absolute doc paths, no chat history and no research.md:
-- **small** → one agent: `docs: design.md, plan.md`, `lenses: comprehension, readiness`.
-- **large** → two agents in ONE message: `readiness` and `red-team`, each on `plan.md` with design.md as `context:`.
+- **small** → one agent with `model: sonnet`: `docs: design.md, plan.md`, `lenses: comprehension, readiness`.
+- **large** → two agents in ONE message (pinned Opus): `readiness` and `red-team`, each on `plan.md` with design.md as `context:`.
 
 Resolve findings per `${CLAUDE_PLUGIN_ROOT}/skills/review/references/resolve.md`. Note contests and escalations under Rulings. Any fix to the already-approved design.md is listed at Gate 2 for re-approval.
 

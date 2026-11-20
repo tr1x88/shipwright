@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0 — 2026-11-20
+Plan with the strongest model, build with the cheapest.
+- New `sw-designer` and `sw-planner` agents (Opus, high effort) write design.md and plan.md; the main thread keeps the interview and both gates, so a Sonnet session still gets Opus-quality plans.
+- `sw-goldfish` is pinned to Opus for large tasks; small tasks override to Sonnet.
+- Execution unchanged: implementers/debuggers on Sonnet, scout/researcher/report-only verify/PR body on Haiku.
+
 ## 0.5.1 — 2026-11-11
 - `/sw:verify-dev` is opt-in: `/sw:ship` and `/sw:pr` stop after the PRs (`stage=done`) and never start it automatically; run it only when the user asks. Session-start hint, managed CLAUDE.md block, README, site and manifests updated.
 

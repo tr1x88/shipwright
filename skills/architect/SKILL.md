@@ -5,7 +5,7 @@ description: Design stage — interviews the user in batches of up to 4 question
 
 # Architect
 
-You build what you believe the user wants, and that belief is usually thinner than it feels. This stage makes the hundred small decisions explicit while they are cheap. Run it in the main thread.
+You build what you believe the user wants, and that belief is usually thinner than it feels. This stage makes the hundred small decisions explicit while they are cheap. The main thread runs the interview and the gate; the document itself is written by `sw-designer` (Opus), so quality does not depend on the session model.
 
 ## 1. Read before asking
 Read `research.md` and the code it points to. Never ask what the code, the research or earlier conversation already answers.
@@ -38,7 +38,7 @@ If the `/sw:threat-model` trigger list matches (large task, auth, money, uploads
 Present 2–3 approaches in one message: each with how it works, trade-offs (complexity, performance, risk, effort) and your recommendation with the deciding reason. The user picks (or you proceed with the recommendation if they say so).
 
 ## 5. design.md → Gate 1
-Write `<main>/.sw/specs/<slug>/design.md` (serves as the ADR):
+Dispatch `sw-designer` (pinned Opus; brief: task, research.md path, answers with their why, chosen approach, threat model, size, output path). Relay any `Open questions` it returns to the user before Gate 1. It writes `<main>/.sw/specs/<slug>/design.md` (serves as the ADR):
 ```markdown
 # Design: <task>
 **Decision:** <one paragraph>
@@ -53,6 +53,6 @@ Write `<main>/.sw/specs/<slug>/design.md` (serves as the ADR):
 ```
 Small tasks: Decision, Contracts, Test strategy only.
 
-**Goldfish (large only).** After writing design.md, dispatch in ONE message two `sw-goldfish` (`docs:` the absolute path of design.md; lenses `comprehension` and `zoom-out`, one agent each). Give them no chat history and no research.md. Resolve findings per `${CLAUDE_PLUGIN_ROOT}/skills/review/references/resolve.md`; add its two gate-summary lines (Fresh reader, Goldfish) to the summary and put escalated questions in the approval ask. Small: skip (its single pass runs in /sw:plan).
+**Goldfish (large only).** After writing design.md, dispatch in ONE message two `sw-goldfish` (pinned Opus; `docs:` the absolute path of design.md; lenses `comprehension` and `zoom-out`, one agent each). Give them no chat history and no research.md. Resolve findings per `${CLAUDE_PLUGIN_ROOT}/skills/review/references/resolve.md`; add its two gate-summary lines (Fresh reader, Goldfish) to the summary and put escalated questions in the approval ask. Small: skip (its single pass runs in /sw:plan).
 
 Show a ≤ 15-line summary and ask for approval. ⛔ Do not plan until approved; apply requested changes and re-ask.

@@ -111,7 +111,7 @@ Every other decision is made on the spot and logged in `plan.md` as `Ruling: <de
 | `/sw:verify-dev` | Opt-in, never run automatically: post-deploy smoke on dev; feature bugs are auto-fixed for up to 2 rounds |
 | `/sw:node-backend` · `/sw:go` · `/sw:frontend` | Stack knowledge packs, loaded only when relevant |
 
-**Agents** (model + effort pinned, overridden per call where it pays): `sw-scout` and `sw-researcher` (Haiku, low effort) · `sw-implementer`, `sw-spec-checker`, `sw-debugger` (Sonnet) · `sw-verifier` (Haiku report-only, Sonnet fix mode) · `sw-docs-writer` (Sonnet llms.txt, Haiku PR body) · `sw-reviewer` (Sonnet small, Opus large/security) · `sw-goldfish` (Sonnet, read-only, fresh-context reader of design and plan). The main thread only does judgment work; full test suite runs once, in verify.
+**Agents** (model + effort pinned, overridden per call where it pays): `sw-scout` and `sw-researcher` (Haiku, low effort) · `sw-implementer`, `sw-spec-checker`, `sw-debugger` (Sonnet) · `sw-verifier` (Haiku report-only, Sonnet fix mode) · `sw-docs-writer` (Sonnet llms.txt, Haiku PR body) · `sw-reviewer` (Sonnet small, Opus large/security) · `sw-goldfish` (Opus large, Sonnet small; read-only, fresh-context reader of design and plan) · `sw-designer` and `sw-planner` (Opus, high effort; write design.md and plan.md so planning quality never depends on the session model). The main thread only does judgment work; full test suite runs once, in verify.
 
 ## Tiered TDD
 
