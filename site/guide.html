@@ -110,7 +110,9 @@ POST /v1/auth/login {"email":"qa@example.com","password":"…"} → .accessToken
     <h2 id="ship">The main command: <code>/sw:ship</code></h2>
 <pre>/sw:ship "add partial refunds to orders"
 /sw:ship "fix: duplicate webhook creates two payments" --small
-/sw:ship --resume            # continue the active task in this worktree</pre>
+/sw:ship --resume            # continue the active task in this worktree
+/sw:ship "add a CSV export" --turbo     # fast path: one spec gate, scoped verify</pre>
+    <p><b>Turbo</b> (<code>--turbo</code>, any size): discover (code) → spec gate → worktree (<code>--no-db</code> when no task needs a DB) → build → scoped verify → one Sonnet review → llms-txt → PR. The goldfish checks and the threat model are skipped (a notice is printed if a security trigger matched), and <code>/sw:ship</code> ends with a timings table.</p>
     <p>Each stage is its own skill, so you can also run any stage on its own, for example <code>/sw:verify</code> before you open a hand-made PR.</p>
 
     <h2 id="sizes">Sizes, gates and when it stops</h2>
