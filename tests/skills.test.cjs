@@ -50,3 +50,50 @@ for (const name of skills) {
     }
   });
 }
+
+const TURBO = path.join(SKILLS, 'ship', 'references', 'turbo.md');
+const turboText = () => fs.readFileSync(TURBO, 'utf8');
+
+test('turbo.md exists and is ≤ 120 lines', () => {
+  assert.ok(fs.existsSync(TURBO), 'turbo.md missing');
+  assert.ok(turboText().trimEnd().split('\n').length <= 120);
+});
+
+test('ship links references/turbo.md', () => {
+  assert.ok(read('ship').includes('](references/turbo.md)'));
+});
+
+test('ship argument-hint offers --turbo', () => {
+  assert.ok((frontmatter(read('ship'))['argument-hint'] || '').includes('--turbo'));
+});
+
+test('turbo.md names the spec, model, scope, Needs field and the notice', () => {
+  const text = turboText();
+  for (const s of [
+    'spec.md',
+    'model: sonnet',
+    'scope.cjs',
+    'Needs: db | none',
+    'turbo: threat-model trigger matched (<trigger>) — skipped by --turbo',
+  ]) assert.ok(text.includes(s), `missing: ${s}`);
+});
+
+test('turbo.md §5 documents the --no-db path', () => {
+  const m = turboText().match(/^## 5\. Worktree\n([\s\S]*?)(?=^## )/m);
+  assert.ok(m, '§5 Worktree section missing');
+  assert.ok(m[1].includes('--no-db'));
+});
+
+test('verify SKILL.md selects steps with scope.cjs', () => {
+  assert.ok(read('verify').includes('scope.cjs'));
+});
+
+test('plan template declares Needs: db | none', () => {
+  assert.ok(read('plan').includes('- Needs: db | none'));
+});
+
+for (const s of ['architect', 'plan', 'worktree', 'build', 'verify', 'review', 'pr']) {
+  test(`${s}: points to turbo.md`, () => {
+    assert.ok(read(s).includes('skills/ship/references/turbo.md'));
+  });
+}

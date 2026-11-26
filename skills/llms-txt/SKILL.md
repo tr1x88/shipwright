@@ -11,7 +11,7 @@ Audience: client developers and AI assistants integrating with this service. The
 Scripts: `S=${CLAUDE_PLUGIN_ROOT}/skills/llms-txt/scripts` (run with `python3 -I`). Spec + conventions: `references/llmstxt-spec.md`. Topic dir defaults to `docs/llm/` (override in `CLAUDE.local.md`).
 
 ## Flow mode (default, inside /sw:ship — applies edits, no approval stop)
-1. **What changed for clients?** From `git diff <base>...HEAD` and design.md: endpoints added/changed/removed, request/response fields, enums, error codes, business rules (limits, states, side effects), config keys clients read.
+1. **What changed for clients?** From `git diff <base>...HEAD` and design.md (turbo: spec.md): endpoints added/changed/removed, request/response fields, enums, error codes, business rules (limits, states, side effects), config keys clients read.
    Nothing client-facing (internal refactor, admin-only, infra) → record `llms-txt: no client-facing change — <reason>` for the PR and stop.
 2. **No `llms.txt` in the repo** → create it: H1 + one-line `>` summary + `## API` link list, and one topic file per module touched (minimal, only what this feature covers). Note it in the PR.
 3. **Update** the topic file(s) for each change. Per endpoint:

@@ -83,6 +83,8 @@ git clone https://github.com/jamesngdev/shipwright && cd shipwright
            opt-in    /sw:verify-dev — only when you ask: smoke on the dev domain after merge + deploy
 ```
 
+**Turbo** (`/sw:ship <task> --turbo`, any size): discover (code) → spec ⛔ → worktree (`--no-db` when no task needs a DB) → build → scoped verify → one Sonnet review → llms-txt → pr. The goldfish checks and the threat model are skipped (a notice is printed if a security trigger matched), and `/sw:ship` ends with a timings table.
+
 After the plan is approved, Shipwright stops only for the following:
 - destructive operations;
 - security-sensitive actions;
@@ -96,7 +98,7 @@ Every other decision is made on the spot and logged in `plan.md` as `Ruling: <de
 
 | Command | Purpose |
 |---|---|
-| `/sw:ship <task>` | The whole flow. `--tiny` / `--small` / `--large` to force a size, `--resume` to continue |
+| `/sw:ship <task>` | The whole flow. `--tiny` / `--small` / `--large` to force a size, `--resume` to continue, `--turbo` for the fast path (one spec gate, no goldfish/threat model, scoped verify, one Sonnet review) |
 | `/sw:discover` | Parallel scouts + parallel research (context7 docs, web, `gh search code`) → `research.md` |
 | `/sw:architect` | Architecture interview: data model, API contract, consistency, idempotency, concurrency, cache, authz, failure modes, performance, observability, rollout → `design.md` |
 | `/sw:plan` | Exact files, dependencies and named tests per task, grouped into parallel waves; goldfish-reviewed (readiness; plus red-team for large) → `plan.md` |

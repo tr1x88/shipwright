@@ -9,6 +9,8 @@ Write for an engineer who has never seen this codebase: they write idiomatic cod
 
 Output: `<main>/.sw/specs/<slug>/plan.md`, written by `sw-planner` (pinned Opus) from the approved design.md; the main thread dispatches it, reviews the result and runs the gate. §1–2 below are its brief.
 
+**Turbo:** no separate plan stage — spec.md carries the file map, tasks, waves and verify (`${CLAUDE_PLUGIN_ROOT}/skills/ship/references/turbo.md` §2–4).
+
 ## 1. File map first
 List every file to create/modify and its single responsibility. Follow existing patterns; split by responsibility, not by layer. This locks decomposition.
 
@@ -20,6 +22,7 @@ A task = the smallest unit with its own test cycle that a reviewer could reject 
 - Pull shared edits (schema + migration + codegen, deps, shared types/contracts, module registration, barrel files) into one early foundation task; later tasks only depend on it.
 - Each task states `Depends` (task IDs it needs merged first) — keep it minimal; a test can stub a sibling's interface from the plan instead of waiting for it.
 - At most one task per wave runs a DB-resetting integration suite.
+- `Needs: db` when the task runs migrations, seeds or integration suites or otherwise needs the worktree DB; else `none` (turbo uses it to create the worktree with `--no-db`).
 
 ```markdown
 # Plan: <task>
@@ -32,6 +35,7 @@ A task = the smallest unit with its own test cycle that a reviewer could reject 
 ### T1: <name>
 - Files: `src/...` (modify), `src/....spec.ts` (create)   ← exact and complete; parallel lanes may touch only these
 - Depends: — | T1, T2
+- Needs: db | none
 - Interface: `functionName(arg: Type): Promise<Result>` / `POST /v1/x {body} → 201 {shape} | 409 ERR_X`
 - TDD: <test-first|integration|none> (see tiers)
 - Tests: `it('rejects refund when order already refunded')`, … (names = behaviors)

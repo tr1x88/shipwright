@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0 — 2026-11-26
+Turbo mode and stage timings.
+- `/sw:ship --turbo` (opt-in, any size): one Sonnet `sw-designer` spec.md and one gate, no goldfish, no threat model (a trigger notice is printed when a non-size trigger matches), one Sonnet review lens.
+- Worktree `--no-db` when no task declares `Needs: db`.
+- New `bin/scope.cjs` picks verify steps and related tests from changed paths, now also for tiny/small in every mode (skipped steps are listed in the PR).
+- Shared `bin/lib/changed.cjs` classifier (coverage-changed unchanged in behavior).
+- `state.cjs timings` plus per-stage timestamps, printed at the end of every `/sw:ship`.
+- Plan tasks declare `Needs: db | none`.
+
 ## 0.6.0 — 2026-11-20
 Plan with the strongest model, build with the cheapest.
 - New `sw-designer` and `sw-planner` agents (Opus, high effort) write design.md and plan.md; the main thread keeps the interview and both gates, so a Sonnet session still gets Opus-quality plans.

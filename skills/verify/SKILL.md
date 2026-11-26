@@ -7,7 +7,7 @@ description: Local verification gate — lint, typecheck, unit, integration, ≥
 
 **Evidence before claims.** "Should pass" is not a result: run it, read the output, then report.
 Run in the worktree. Commands come from `CLAUDE.local.md` → Commands. `SW=~/.claude/shipwright/bin`.
-This is the one place the full suite runs. Large tasks: dispatch `sw-verifier` with the worktree path, commands, base branch and the plan's Verify section — `model: haiku` for the report-only run, `model: sonnet` when dispatching it in fix mode; it returns the table below. Small/tiny: run inline.
+This is the one place the full suite runs. Large tasks: dispatch `sw-verifier` with the worktree path, commands, base branch and the plan's Verify section (turbo: spec.md) — `model: haiku` for the report-only run, `model: sonnet` when dispatching it in fix mode; it returns the table below. Small/tiny: run inline.
 
 ## Pipeline (stop at the first failing step, fix, re-run from that step)
 Run independent steps concurrently: 1–3 (lint, typecheck, unit) as parallel Bash calls in one message (or `run_in_background` + wait); start the dev server (7) in the background while 4–6 run. Report the lowest-numbered failure first.
@@ -24,8 +24,9 @@ Run independent steps concurrently: 1–3 (lint, typecheck, unit) as parallel Ba
 | 8 | API smoke | every changed endpoint: success + each error case pass |
 | 9 | Playwright | frontend only: changed flows pass, 0 console errors, 0 failed requests |
 
-Tiny tasks: steps 1–3 for the touched area + 8 if an endpoint changed.
-Small tasks: skip step 6 (build) unless build config, dependencies, entry points or module wiring changed (`git diff --name-only <base>...HEAD`), and step 9 unless frontend files changed. Note skipped steps as `skipped — <reason>`.
+Step selection — tiny, small, and every size under turbo: run `node $SW/scope.cjs --base <base>` and follow `steps` (lint→1, typecheck→2, unit→3, integration→4, coverage→5, build→6, devServer→7, smoke→8, playwright→9). Unit `mode: related` → run its `command`; `mode: full` → the repo's unit command. Related run reports "No tests found" → full unit suite; never `--passWithNoTests`. scope.cjs exits non-zero → full pipeline.
+Tiny: steps 1–3 for the touched area + 8 if an endpoint changed — scope only supplies the related-test command. Large non-turbo: full pipeline. Note every `run: false` step as `<step>: skipped — <reason>` (it goes into the PR body).
+Turbo: also apply the no-DB guard in `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/turbo.md` §7 before steps 4, 7 and 8.
 
 ## Fix rounds
 Failure → `/sw:debug` style root cause → fix → re-run from the failed step. `node $SW/state.cjs set stage=verify round=<n>`. After 3 rounds still failing → STOP and report (failing step, root-cause hypothesis, what was tried). Never weaken a test, skip it, or lower thresholds to pass.

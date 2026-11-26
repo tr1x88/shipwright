@@ -7,6 +7,8 @@ description: Creates a task's isolated workspace — git worktree in .worktree/,
 
 `SW=~/.claude/shipwright/bin`
 
+Turbo: decide `--no-db` from the approved spec.md per `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/turbo.md` §5.
+
 ## 1. Create
 ```bash
 cd <main checkout> && node $SW/wt.cjs create <slug> --prefix <feat|fix|refactor|perf|chore> --size <small|large>
@@ -31,7 +33,7 @@ The script (JSON output):
 ```bash
 mkdir -p <wt>/docs/specs/<YYMMDD>-<slug> && mv <main>/.sw/specs/<slug>/* <wt>/docs/specs/<YYMMDD>-<slug>/ && node $SW/state.cjs clear   # (in main)
 ```
-First commit in the worktree: `docs(spec): <slug> design and plan`.
+First commit in the worktree: `docs(spec): <slug> design and plan` (turbo: spec).
 
 ## 4. Work there
 From now on use absolute paths under `<wt>` for every file tool, and prefix shell commands with `cd <wt> &&`. Update state there: `cd <wt> && node $SW/state.cjs set stage=build`.

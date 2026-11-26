@@ -5,7 +5,9 @@ description: Build stage — executes the approved plan with tiered TDD via sw-i
 
 # Build
 
-Run continuously until all tasks are done. Record decisions as Rulings in `plan.md`.
+Run continuously until all tasks are done. Record decisions as Rulings in `plan.md` (turbo: spec.md).
+
+Turbo: briefs come from spec.md and Rulings go there; no-DB brief line per `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/turbo.md` §6.
 
 ## Tiered TDD (the Iron Law for test-first tasks: no production code without a failing test first)
 - **test-first** (domain/service logic, every bug fix): write the test → run it, see it fail for the expected reason → minimal code → green → refactor. Wrote code first? Delete it and start from the test.
@@ -22,7 +24,7 @@ The main thread orchestrates; it does not write the code (Opus output is the slo
 ## Parallel by default — waves
 The plan's `## Waves` section groups tasks: tasks in one wave have no `Depends` on each other and **disjoint `Files`**. Default is parallel; serial is the exception that needs a reason.
 - Plan has no waves (older plan)? Derive them now from `Depends` + `Files` and record a Ruling.
-- A wave of one task → one implementer. A small plan whose tasks all overlap → one implementer for the whole plan (brief `<wt>/.sw/tasks/plan.md`).
+- A wave of one task → one implementer. A small plan whose tasks all overlap → one implementer for the whole plan (brief `<wt>/.sw/tasks/plan.md`; turbo: from spec.md).
 
 For each wave, in order:
 1. Write one brief per task to `<wt>/.sw/tasks/T<n>.md`: task text, design excerpts (contracts, error codes), its exact file list, patterns to follow, test commands, and the line `Mode: parallel — do not commit; touch only the files listed`.
