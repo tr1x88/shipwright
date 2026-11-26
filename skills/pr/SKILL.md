@@ -24,14 +24,16 @@ If the user's instructions define per-owner identity switches (e.g. `aw` work / 
 `git push -u origin $BRANCH`. Body (same for both PRs) written to `.sw/pr-body.md` — write it yourself or dispatch `sw-docs-writer` (pr-body) with `model: haiku`:
 ```markdown
 ## Summary
-<what and why, grouped by area; link docs/specs/<YYMMDD>-<slug>/design.md>
+<what and why, grouped by area; link docs/specs/<YYMMDD>-<slug>/design.md (turbo: spec.md)>
 ## API changes
 <METHOD /path — Added|Changed|Removed; request/response/error changes — or "None.">
 ## Verification
 <verify step table: lint, typecheck, unit, integration, coverage, build, dev server, smoke, playwright>
 <smoke table + re-runnable curl lines (no tokens)>
+<skipped steps: `<step>: skipped — <reason>` (from scope.cjs)>
 ## Rulings & follow-ups
-<rulings from plan.md worth a reviewer's attention; minor review items deferred>
+<rulings from plan.md (turbo: spec.md) worth a reviewer's attention; minor review items deferred>
+<turbo: first line per `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/turbo.md` §9>
 ```
 Never fabricate results: a step not run is written as "not run — <reason>".
 

@@ -7,6 +7,8 @@ description: Design stage — interviews the user in batches of up to 4 question
 
 You build what you believe the user wants, and that belief is usually thinner than it feels. This stage makes the hundred small decisions explicit while they are cheap. The main thread runs the interview and the gate; the document itself is written by `sw-designer` (Opus), so quality does not depend on the session model.
 
+**Turbo (`--turbo`):** follow `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/turbo.md` §2–4 instead — §1–2 as below, §3 capped at ONE batch of ≤ 4 questions, no §3b, §4 in one message, then one `sw-designer` (`model: sonnet`) writes spec.md; no §5 goldfish.
+
 ## 1. Read before asking
 Read `research.md` and the code it points to. Never ask what the code, the research or earlier conversation already answers.
 

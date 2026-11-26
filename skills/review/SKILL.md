@@ -9,10 +9,11 @@ description: Whole-branch review by sw-reviewer (Sonnet for small, Opus for larg
 Dispatch `sw-reviewer` — model by size:
 - **small** and no security lens → `model: sonnet` override; max 1 re-review cycle.
 - **large**, or the security lens applies (auth, secrets, payments, untrusted input to SQL/files/URLs) → its pinned Opus; max 2 re-review cycles.
+- **turbo** (any size) → one `sw-reviewer`, `model: sonnet`, one lens, max 1 re-review cycle — lens rule in `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/turbo.md` §8.
 
 Inputs:
 - worktree path, `BASE_SHA=$(git merge-base <base> HEAD)`, `HEAD_SHA=$(git rev-parse HEAD)`
-- paths to `design.md` and `plan.md`
+- paths to `design.md` and `plan.md` (turbo: spec.md for both)
 - which lenses apply (pass the reference paths only for those):
   - `${CLAUDE_PLUGIN_ROOT}/skills/review/references/security.md` — any endpoint, auth, input handling, file/URL/SQL handling, secrets
   - `${CLAUDE_PLUGIN_ROOT}/skills/review/references/performance.md` — DB queries, loops over I/O, caching, list endpoints, hot paths, frontend rendering
