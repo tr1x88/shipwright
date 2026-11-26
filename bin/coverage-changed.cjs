@@ -5,7 +5,8 @@
 // Exit 1 when any changed source file is below --min. Test files and non-source files are ignored.
 const fs = require('fs');
 const path = require('path');
-const { git, toplevel } = require('./lib/git.cjs');
+const { toplevel } = require('./lib/git.cjs');
+const { changedFiles, isCoverageTarget } = require('./lib/changed.cjs');
 
 const args = process.argv.slice(2);
 const opt = (k, d) => {
@@ -16,13 +17,7 @@ const top = toplevel(process.cwd()) || process.cwd();
 const base = opt('base', 'master');
 const min = Number(opt('min', 80));
 
-const SOURCE = /\.(ts|tsx|js|jsx|mjs|cjs|go|vue|svelte)$/;
-const TEST = /(\.(spec|test|e2e-spec)\.[jt]sx?$|_test\.go$|\/(__tests__|test|tests|e2e)\/|\.d\.ts$|\.(config|setup)\.[jt]s$|\/migrations?\/|\/dto\/|\.dto\.ts$|\.module\.ts$|main\.ts$)/;
-
-const mergeBase = git(['merge-base', base, 'HEAD'], top);
-const changed = git(['diff', '--name-only', '--diff-filter=AM', mergeBase], top)
-  .split('\n')
-  .filter((f) => f && SOURCE.test(f) && !TEST.test(f));
+const changed = changedFiles(top, base, { diffFilter: 'AM' }).filter(isCoverageTarget);
 
 function fromLcov(file) {
   const cov = {};

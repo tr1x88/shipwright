@@ -4,6 +4,7 @@
 //   state.cjs get
 //   state.cjs set stage=verify round=2 size=large
 //   state.cjs clear
+//   state.cjs timings
 const { toplevel } = require('./lib/git.cjs');
 const state = require('./lib/state.cjs');
 
@@ -16,12 +17,16 @@ if (cmd === 'set') {
     const i = p.indexOf('=');
     if (i < 1) continue;
     const v = p.slice(i + 1);
-    patch[p.slice(0, i)] = /^\d+$/.test(v) ? Number(v) : v === 'null' ? null : v;
+    patch[p.slice(0, i)] = /^\d+$/.test(v) ? Number(v)
+      : v === 'null' ? null : v === 'true' ? true : v === 'false' ? false : v;
   }
   console.log(JSON.stringify(state.write(top, patch)));
 } else if (cmd === 'clear') {
   require('fs').rmSync(state.file(top), { force: true });
   console.log('cleared');
+} else if (cmd === 'timings') {
+  const s = state.read(top);
+  console.log(state.formatTimings(s && s.stages));
 } else {
   console.log(JSON.stringify(state.read(top)));
 }
