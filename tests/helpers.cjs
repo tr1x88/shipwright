@@ -5,6 +5,8 @@ const os = require('os');
 const path = require('path');
 
 const BIN = path.join(__dirname, '..', 'bin');
+// Keep tests off the real ~/.claude/shipwright (config, sw.db).
+process.env.SW_HOME ||= fs.mkdtempSync(path.join(os.tmpdir(), 'sw-home-'));
 
 function runNode(script, { input = '', cwd, env = {}, args = [] } = {}) {
   const r = spawnSync('node', [path.join(BIN, script), ...args], {

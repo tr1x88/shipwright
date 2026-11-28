@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.8.0 — 2026-11-28
+Shorter critical path, tickets and a live board.
+- **Tickets + board.** Plan tasks are tickets: text stays in plan.md, status and timing go to a shared SQLite DB (`~/.claude/shipwright/sw.db`, `node:sqlite`, Node ≥ 22.5). `ticket.cjs sync|add|set|list|report`; a PreToolUse hook marks a ticket `doing` when its implementer is dispatched. `/sw:board` (`ui.cjs`) serves a local live web board for every repo and worktree.
+- Stage changes are mirrored into the DB; `/sw:ship` ends with `ticket.cjs report` (time per stage and per ticket).
+- **New `quick` tier** (≤ ~100 lines, 1–3 files): checklist in chat, one gate, the main thread implements.
+- **Small tasks: one document, one gate.** No design.md or Gate 1; plan.md carries Decisions / Contracts / Test strategy plus the tasks. Goldfish skipped for plans of ≤ 3 tasks.
+- **Review runs alongside verify** (dispatched once lint/typecheck/unit pass); one combined fix round.
+- **Worktree is created first, in the background**; specs are written straight into `<wt>/docs/specs/…` (no drafts in the main checkout, no move step).
+- Architect: the approach choice is the first interview question instead of a separate round trip.
+- Build: no per-task brief files — implementers read their `### T<n>` plan section, which the planner now writes self-contained.
+- Model routing: an Opus-class (or stronger) session writes design.md/plan.md inline instead of dispatching `sw-designer`/`sw-planner`.
+- Quick/small verify skips the API smoke when integration tests already cover every changed endpoint.
+
 ## 0.7.0 — 2026-11-26
 Turbo mode and stage timings.
 - `/sw:ship --turbo` (opt-in, any size): one Sonnet `sw-designer` spec.md and one gate, no goldfish, no threat model (a trigger notice is printed when a non-size trigger matches), one Sonnet review lens.

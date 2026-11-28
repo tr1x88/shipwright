@@ -264,6 +264,8 @@ async function cmdCreate(args) {
   git(branchExists ? ['worktree', 'add', wtPath, branch] : ['worktree', 'add', '-b', branch, wtPath, base], root);
 
   const result = { path: wtPath, branch, base, slug };
+  // State first: the slow part (deps, DB clone) may run in the background while stages already record progress.
+  state.write(wtPath, { slug, branch, base, size: args.size || null, stage: 'worktree', round: 0, mainRoot: root });
   result.deps = args.deps === false ? 'skipped' : cloneDeps(root, wtPath);
   const envFiles = copyEnv(root, wtPath);
   result.env = envFiles.map((f) => path.relative(wtPath, f));
@@ -286,8 +288,7 @@ async function cmdCreate(args) {
   }
 
   state.write(wtPath, {
-    slug, branch, base, size: args.size || null, stage: 'worktree', round: 0,
-    mainRoot: root, port: result.port,
+    port: result.port,
     db: result.db && result.db.name ? { name: result.db.name, mode: result.db.mode, needsSeed: result.db.needsSeed } : null,
     redis: result.redis && result.redis.db ? { host: result.redis.host, db: result.redis.db } : null,
   });
@@ -338,6 +339,13 @@ function cmdRemove(args) {
     writeAlloc(alloc);
   }
   git(['worktree', 'remove', ...(args.force ? ['--force'] : []), wtPath], root);
+  if (s.slug && s.stage !== 'done') {
+    try {
+      require('./lib/db.cjs').trackStage(s.mainRoot || root, s.slug, null, 'removed'); // abandoned: leave the board's active list
+    } catch {
+      /* board is optional */
+    }
+  }
   if (s.branch && args.branch !== false) {
     const del = tryGit(['branch', args.force ? '-D' : '-d', s.branch], root);
     result.branchDeleted = del !== null;

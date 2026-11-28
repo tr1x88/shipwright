@@ -28,7 +28,7 @@ Run when ANY is true; otherwise skip and say "no threat model: <why>".
 6. **Ask only if blocked** — a mitigation that changes the product (e.g. email verification, approval step) goes to the user as one `AskUserQuestion`; everything else is decided and recorded.
 
 ## 4. Output
-Append to `design.md` (or write `<main>/.sw/specs/<slug>/threat-model.md` when standalone), max ~25 lines:
+Append to `design.md` (or write `$SPEC/threat-model.md` when standalone), max ~25 lines:
 
 ```markdown
 ## Threat model

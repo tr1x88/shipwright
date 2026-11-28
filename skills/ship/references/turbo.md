@@ -52,11 +52,12 @@ Show:
 ## 5. Worktree
 - No task has `Needs: db` and spec.md has no `## Data changes` → `node $SW/wt.cjs create <slug> --prefix <p> --size <s> --no-db`, and record `Ruling: worktree without DB — no task needs db`.
 - Otherwise the normal `/sw:worktree` command.
+- Then move spec.md in (`/sw:worktree` §3) and `node $SW/ticket.cjs sync $SPEC/spec.md` — its tasks are the tickets.
 - Redis, deps and port are unchanged. With `--no-db`, the worktree env files keep the main checkout's DB URLs.
 
 ## 6. Build
-- Briefs come from spec.md (tasks, contracts, waves); Rulings are appended to spec.md.
-- With `--no-db` every brief carries the exact line: `No worktree DB: do not run integration suites, migrations or seeds; stop with NEEDS_CONTEXT if the task needs them.`
+- The implementer's `Plan:` line points to spec.md (its `### T<n>` section is the brief); Rulings are appended to spec.md.
+- With `--no-db` every dispatch prompt carries the exact line: `No worktree DB: do not run integration suites, migrations or seeds; stop with NEEDS_CONTEXT if the task needs them.`
 
 ## 7. Verify
 Run `node $SW/scope.cjs --base <base>` and follow `steps`; non-zero exit → full pipeline. scope.cjs reads committed changes only: commit fix-round edits before re-running it.

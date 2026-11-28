@@ -16,6 +16,12 @@
         ]
       },
       {
+        "matcher": "Agent|Task",
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/bin/ticket-hook.cjs\"" }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/bin/guard-bash.cjs\"" }
