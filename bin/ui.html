@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shipwright Board</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0f172a; --card: #1b2336; --muted: #272f42; --border: #334155;
+    --fg: #f8fafc; --fg-muted: #a3b1c6; --accent: #22c55e; --ring: #f8fafc;
+    --todo: #a3b1c6; --doing: #60a5fa; --done: #4ade80; --blocked: #f87171;
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --radius: 8px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      color-scheme: light;
+      --bg: #f8fafc; --card: #ffffff; --muted: #eef2f7; --border: #cbd5e1;
+      --fg: #0f172a; --fg-muted: #475569; --accent: #15803d; --ring: #0f172a;
+      --todo: #475569; --doing: #1d4ed8; --done: #15803d; --blocked: #b91c1c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 var(--sans); }
+  .mono { font-family: var(--mono); }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+  header.top { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3);
+    padding: var(--s3) var(--s4); background: var(--bg); border-bottom: 1px solid var(--border); }
+  h1 { margin: 0; font-size: 16px; font-weight: 600; }
+  .live { display: inline-flex; align-items: center; gap: var(--s2); color: var(--fg-muted); font-size: 12px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blocked); }
+  .live.on .dot { background: var(--accent); }
+  .seg { margin-left: auto; display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .seg button { min-height: 36px; padding: 0 var(--s3); background: transparent; border: 0; color: var(--fg-muted); }
+  .seg button[aria-pressed="true"] { background: var(--muted); color: var(--fg); font-weight: 600; }
+  @media (pointer: coarse) { .seg button { min-height: 44px; } }
+
+  main { max-width: 1440px; margin: 0 auto; padding: var(--s4); display: grid; gap: var(--s4); }
+  .empty { padding: var(--s5); text-align: center; color: var(--fg-muted); border: 1px dashed var(--border); border-radius: var(--radius); }
+
+  .task { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--s4); }
+  .task-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s2) var(--s3); }
+  .task-head h2 { margin: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+  .repo { color: var(--fg-muted); font-size: 12px; }
+  .badge { display: inline-flex; align-items: center; gap: var(--s1); padding: 0 var(--s2); border: 1px solid var(--border);
+    border-radius: 999px; font-size: 12px; line-height: 20px; white-space: nowrap; }
+  .badge.stage { border-color: var(--accent); color: var(--accent); }
+  .spacer { margin-left: auto; }
+  .meta { color: var(--fg-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  .bar { display: flex; height: 6px; margin: var(--s3) 0 var(--s2); border-radius: 3px; overflow: hidden; background: var(--muted); }
+  .bar span { min-width: 2px; background: var(--border); }
+  .bar span:nth-child(even) { background: var(--fg-muted); }
+  .bar span.current { background: var(--accent); }
+  .stages { display: flex; flex-wrap: wrap; gap: var(--s2); margin: 0 0 var(--s4); padding: 0; list-style: none; }
+  .stages li { font-size: 12px; color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+  .stages li.current { color: var(--fg); font-weight: 600; }
+  .stages li + li::before { content: "→"; margin-right: var(--s2); color: var(--border); }
+
+  .board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s3); }
+  @media (max-width: 1023px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 599px) { .board { grid-template-columns: minmax(0, 1fr); } }
+  .col { background: var(--muted); border-radius: var(--radius); padding: var(--s2); min-height: 72px; }
+  .col h3 { display: flex; align-items: center; gap: var(--s2); margin: var(--s1) var(--s1) var(--s2); font-size: 12px;
+    font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .col h3 svg { width: 14px; height: 14px; flex: none; }
+  .col h3 .count { margin-left: auto; color: var(--fg-muted); font-weight: 400; }
+  .col[data-status="todo"] h3 { color: var(--todo); }
+  .col[data-status="doing"] h3 { color: var(--doing); }
+  .col[data-status="done"] h3 { color: var(--done); }
+  .col[data-status="blocked"] h3 { color: var(--blocked); }
+  .col ul { display: grid; gap: var(--s2); margin: 0; padding: 0; list-style: none; }
+
+  .ticket { display: block; width: 100%; min-height: 44px; padding: var(--s2) var(--s3); text-align: left; background: var(--card);
+    border: 1px solid var(--border); border-left: 3px solid var(--todo); border-radius: 6px; transition: border-color 150ms ease-out; }
+  .ticket:hover { border-color: var(--fg-muted); }
+  [data-status="doing"] .ticket { border-left-color: var(--doing); }
+  [data-status="done"] .ticket { border-left-color: var(--done); }
+  [data-status="blocked"] .ticket { border-left-color: var(--blocked); }
+  .ticket .id { font-family: var(--mono); font-weight: 600; margin-right: var(--s2); }
+  .ticket .title { overflow-wrap: anywhere; }
+  .ticket .meta { display: block; margin-top: 2px; }
+  [data-status="doing"] .ticket .id::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 6px;
+    border-radius: 50%; background: var(--doing); vertical-align: middle; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .25; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  dialog { width: min(720px, calc(100vw - 32px)); max-height: 80vh; padding: 0; color: var(--fg); background: var(--card);
+    border: 1px solid var(--border); border-radius: var(--radius); }
+  dialog::backdrop { background: rgb(0 0 0 / .55); }
+  .dlg-head { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--border); }
+  .dlg-head h2 { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+  .dlg-head button { margin-left: auto; min-width: 44px; min-height: 36px; background: var(--muted); border: 1px solid var(--border); border-radius: 6px; }
+  dialog pre { margin: 0; padding: var(--s4); overflow: auto; max-height: calc(80vh - 64px); font: 13px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Shipwright Board</h1>
+  <span class="live" id="live" role="status"><span class="dot" aria-hidden="true"></span><span id="live-text">Connecting…</span></span>
+  <div class="seg" role="group" aria-label="Which tasks to show">
+    <button type="button" id="f-active" aria-pressed="true">Active</button>
+    <button type="button" id="f-all" aria-pressed="false">All</button>
+  </div>
+</header>
+<main id="main" aria-live="polite"><p class="empty">Loading…</p></main>
+<dialog id="dlg" aria-labelledby="dlg-title">
+  <div class="dlg-head"><h2 id="dlg-title"></h2><button type="button" id="dlg-close">Close</button></div>
+  <pre id="dlg-body"></pre>
+</dialog>
+<script>
+'use strict';
+const STATUSES = [
+  ['todo', 'To do', '<circle cx="8" cy="8" r="6"/>'],
+  ['doing', 'In progress', '<circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/>'],
+  ['done', 'Done', '<circle cx="8" cy="8" r="6"/><path d="M5.5 8.2l1.8 1.8 3.4-3.8"/>'],
+  ['blocked', 'Blocked', '<circle cx="8" cy="8" r="6"/><path d="M4 12L12 4"/>'],
+];
+const FINISHED = ['done', 'removed'];
+const $ = (id) => document.getElementById(id);
+let data = { tasks: [] };
+let skew = 0; // server clock − browser clock
+let showAll = false;
+
+function el(tag, props = {}, ...kids) {
+  const n = Object.assign(document.createElement(tag), props);
+  n.append(...kids.filter((k) => k != null));
+  return n;
+}
+function dur(from, to) {
+  if (!from) return '';
+  const s = Math.max(0, Math.round(((to ? new Date(to) : Date.now() + skew) - new Date(from)) / 1000));
+  if (s < 60) return s + 's';
+  if (s < 3600) return Math.floor(s / 60) + 'm ' + String(s % 60).padStart(2, '0') + 's';
+  return Math.floor(s / 3600) + 'h ' + String(Math.floor((s % 3600) / 60)).padStart(2, '0') + 'm';
+}
+// A ticking duration: elements carrying data-from are refreshed every second without a re-render.
+function clock(from, to, prefix = '') {
+  const n = el('span', { textContent: prefix + dur(from, to) });
+  if (from && !to) Object.assign(n.dataset, { from, prefix });
+  return n;
+}
+
+function renderTask(t) {
+  const finished = FINISHED.includes(t.stage);
+  const stages = t.stages.filter((s) => s.stage !== 'done');
+  const end = (i) => (t.stages[t.stages.indexOf(stages[i]) + 1] || {}).at || null;
+  const done = t.tickets.filter((k) => k.status === 'done').length;
+
+  const head = el('div', { className: 'task-head' },
+    el('h2', { className: 'mono', textContent: t.slug }),
+    el('span', { className: 'repo mono', textContent: t.repo.split('/').pop(), title: t.repo }),
+    t.size ? el('span', { className: 'badge', textContent: t.size }) : null,
+    el('span', { className: 'badge stage', textContent: t.stage || 'unknown' }),
+    el('span', { className: 'meta spacer', textContent: t.tickets.length ? `${done}/${t.tickets.length} tickets done` : '' }),
+    stages.length ? el('span', { className: 'meta' }, clock(stages[0].at, finished ? t.stages.at(-1).at : null, 'total ')) : null);
+
+  const bar = el('div', { className: 'bar' });
+  bar.setAttribute('aria-hidden', 'true');
+  const list = el('ol', { className: 'stages' });
+  stages.forEach((s, i) => {
+    const to = end(i);
+    const current = !to && !finished;
+    const secs = ((to ? new Date(to) : Date.now() + skew) - new Date(s.at)) / 1000;
+    const seg = el('span', { className: current ? 'current' : '', title: s.stage });
+    seg.style.flex = `${Math.max(secs, 1)} 0 0`;
+    bar.append(seg);
+    list.append(el('li', { className: current ? 'current' : '' }, s.stage + ' ', clock(s.at, to)));
+  });
+
+  const board = el('div', { className: 'board' });
+  for (const [status, label, icon] of STATUSES) {
+    const items = t.tickets.filter((k) => k.status === status);
+    const h = el('h3');
+    h.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">${icon}</svg>`;
+    h.append(label, el('span', { className: 'count', textContent: String(items.length) }));
+    const ul = el('ul');
+    for (const k of items) {
+      const meta = el('span', { className: 'meta' }, [k.wave != null ? 'W' + k.wave : null, k.agent].filter(Boolean).join(' · '));
+      if (k.started_at) meta.append(meta.textContent ? ' · ' : '', clock(k.started_at, k.ended_at));
+      const btn = el('button', { type: 'button', className: 'ticket' },
+        el('span', { className: 'id', textContent: k.id }), el('span', { className: 'title', textContent: k.title }), meta);
+      btn.addEventListener('click', () => openTicket(t, k));
+      ul.append(el('li', {}, btn));
+    }
+    const col = el('section', { className: 'col' }, h, ul);
+    col.dataset.status = status;
+    col.setAttribute('aria-label', `${label}: ${items.length}`);
+    board.append(col);
+  }
+  const body = t.tickets.length ? board : el('p', { className: 'meta', textContent: 'No tickets yet — they appear once the plan is approved.' });
+  return el('article', { className: 'task' }, head, bar, list, body);
+}
+
+function render() {
+  const tasks = data.tasks.filter((t) => showAll || !FINISHED.includes(t.stage));
+  const main = $('main');
+  main.replaceChildren(...(tasks.length ? tasks.map(renderTask) : [el('p', { className: 'empty',
+    textContent: showAll ? 'No tasks tracked yet. Start one with /sw:ship in any repo.' : 'No active tasks. Switch to “All” to see finished ones.' })]));
+}
+
+async function load() {
+  const r = await fetch('/api/state');
+  data = await r.json();
+  skew = new Date(data.now) - Date.now();
+  render();
+}
+
+async function openTicket(task, k) {
+  $('dlg-title').textContent = `${k.id} · ${k.title}`;
+  $('dlg-body').textContent = 'Loading…';
+  $('dlg').showModal();
+  const q = new URLSearchParams({ repo: task.repo, slug: task.slug, id: k.id });
+  const r = await fetch('/api/ticket?' + q).catch(() => null);
+  $('dlg-body').textContent = r && r.ok ? (await r.json()).body : 'This ticket has no plan.md section (added by hand, or the plan file moved).';
+}
+$('dlg-close').addEventListener('click', () => $('dlg').close());
+
+for (const [id, all] of [['f-active', false], ['f-all', true]]) {
+  $(id).addEventListener('click', () => {
+    showAll = all;
+    $('f-active').setAttribute('aria-pressed', String(!all));
+    $('f-all').setAttribute('aria-pressed', String(all));
+    render();
+  });
+}
+
+setInterval(() => {
+  for (const n of document.querySelectorAll('[data-from]')) n.textContent = n.dataset.prefix + dur(n.dataset.from);
+}, 1000);
+
+const setLive = (on) => { $('live').classList.toggle('on', on); $('live-text').textContent = on ? 'Live' : 'Reconnecting…'; };
+const es = new EventSource('/events');
+es.onopen = () => { setLive(true); load(); };
+es.onmessage = load;
+es.onerror = () => setLive(false);
+</script>
+</body>
+</html>

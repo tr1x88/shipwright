@@ -5,7 +5,7 @@ description: Research stage — maps relevant code and, for large tasks, library
 
 # Discover
 
-Output: `<main>/.sw/specs/<slug>/research.md` — at most one page. Facts with file:line or URL, no filler.
+Output: `$SPEC/research.md` (`SPEC=<wt>/docs/specs/<YYMMDD>-<slug>`, see `/sw:ship`) — at most one page. Facts with file:line or URL, no filler.
 
 Run everything independent **at once**: in one message dispatch the scouts and (for large tasks) the researchers together, while you read the entry points yourself.
 
@@ -20,7 +20,7 @@ Dispatch 2–3 `sw-researcher` agents **in one message** (parallel), each with O
 - library docs — "How does <lib vX> do <thing>? Breaking changes since <version in lockfile>?" (context7 first)
 - practice — "Proven approaches + pitfalls for <problem> at <scale>" (WebSearch, prefer official docs and engineering blogs < 2 years old)
 - prior art — "How do well-maintained repos implement <thing>?" (`gh search code '<query>' --limit 10`, then read 1–2 files)
-Give each: the question, versions from the lockfile, what is already known, and the report path `<main>/.sw/specs/<slug>/research-<topic>.md`. Send them in the same message as the scouts from step 0 — code mapping and research run concurrently.
+Give each: the question, versions from the lockfile, what is already known, and the report path `$SPEC/research-<topic>.md`. Send them in the same message as the scouts from step 0 — code mapping and research run concurrently.
 
 ## research.md template
 ```markdown

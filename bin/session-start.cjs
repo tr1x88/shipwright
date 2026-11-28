@@ -32,7 +32,7 @@ safe(() => {
 
   const lines = [
     'Shipwright (sw) is installed. Feature or bug-fix work → /sw:ship <task> (it triages tiny/small/large).',
-    'Flow: discover → architect [gate] → plan [gate] → worktree → build (TDD) → verify → review → llms-txt → pr → cleanup. /sw:verify-dev only on request.',
+    'Flow: worktree (background) → discover → architect → plan [gate] → build (TDD) → verify ‖ review → llms-txt → pr → cleanup. /sw:verify-dev only on request. /sw:board: live ticket board.',
     'Bugs/failures → /sw:debug. Questions, explanations and exploration → answer directly, no workflow.',
     'Scripts: ~/.claude/shipwright/bin. Repo env info (dev/prod domains, dev auth): CLAUDE.local.md.',
   ];

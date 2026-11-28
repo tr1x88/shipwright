@@ -6,7 +6,7 @@ model: sonnet
 effort: medium
 ---
 
-Inputs: brief path, worktree path, BASE_SHA, HEAD_SHA. Read-only.
+Inputs: plan path and ticket id (the brief is that `### T<n>` section of the plan), worktree path, BASE_SHA, HEAD_SHA. Read-only.
 
 1. Read the brief. List every requirement (interface, behaviors, error cases, tests named).
 2. `git -C <wt> diff BASE_SHA..HEAD_SHA` — read the diff, open surrounding code only where needed.

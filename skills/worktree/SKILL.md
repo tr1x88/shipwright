@@ -7,9 +7,9 @@ description: Creates a task's isolated workspace — git worktree in .worktree/,
 
 `SW=~/.claude/shipwright/bin`
 
-Turbo: decide `--no-db` from the approved spec.md per `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/turbo.md` §5.
-
-## 1. Create
+## 1. Create (right after triage, in the background)
+Run with `run_in_background` and continue with discover/architect; the branch, the directory and `.sw-state.json` exist within a second, the dependency clone and DB dump finish later.
+Turbo: create it after the spec gate instead, deciding `--no-db` from the approved spec.md per `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/turbo.md` §5.
 ```bash
 cd <main checkout> && node $SW/wt.cjs create <slug> --prefix <feat|fix|refactor|perf|chore> --size <small|large>
 ```
@@ -22,18 +22,16 @@ The script (JSON output):
 - allocates an empty Redis db index, sets a free `PORT`, rewrites the worktree's env files;
 - writes `.sw-state.json` (statusline / resume).
 
-## 2. Read the result and act
+## 2. Read the result and act (when the background command finishes — at the latest before build)
 - `db.needsSeed` → run the repo's seed command (from `CLAUDE.local.md`) inside the worktree.
 - `db.error` / `redis.error` → fix the cause (wrong password? server down? → `/sw:setup`), then `node $SW/wt.cjs remove <slug> --force` and recreate. Do not continue on the main DB.
 - `deps[].mode == "symlink"` → run a real install inside the worktree before changing dependencies or the Prisma schema.
 - Prisma repo: run `npx prisma generate` in the worktree if the schema will change.
 - Go repo: nothing to install (module cache is shared).
 
-## 3. Move the specs in
-```bash
-mkdir -p <wt>/docs/specs/<YYMMDD>-<slug> && mv <main>/.sw/specs/<slug>/* <wt>/docs/specs/<YYMMDD>-<slug>/ && node $SW/state.cjs clear   # (in main)
-```
-First commit in the worktree: `docs(spec): <slug> design and plan` (turbo: spec).
+## 3. Specs live here
+`SPEC=<wt>/docs/specs/<YYMMDD>-<slug>` — research.md, design.md and plan.md are written there directly. After the plan gate: first commit `docs(spec): <slug> design and plan`.
+Turbo (spec.md was drafted in the main checkout): `mkdir -p $SPEC && mv <main>/.sw/specs/<slug>/* $SPEC/ && node $SW/state.cjs clear` (in main); first commit `docs(spec): <slug> spec`.
 
 ## 4. Work there
 From now on use absolute paths under `<wt>` for every file tool, and prefix shell commands with `cd <wt> &&`. Update state there: `cd <wt> && node $SW/state.cjs set stage=build`.

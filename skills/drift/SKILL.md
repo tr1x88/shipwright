@@ -9,7 +9,7 @@ argument-hint: "[dir]"
 Specs are point-in-time. Report where docs and code disagree; never edit code or docs.
 
 1. **List specs** in `[dir]` (default `docs/specs`): each `<YYMMDD>-<slug>/` folder (`design.md` + `plan.md` if present) and each top-level `.md` in `[dir]` whose title starts with `# Design` or that has a `## Decisions` section. None found → say so and stop.
-2. **Dispatch** one `sw-goldfish` per spec: `docs:` its design.md (+ plan.md), `lenses: drift`. Send each batch of ≤ 8 in ONE message, parallel, and wait for all of them.
+2. **Dispatch** one `sw-goldfish` per spec: `docs:` its design.md and/or plan.md (small tasks ship only a plan.md that carries the decisions), `lenses: drift`. Send each batch of ≤ 8 in ONE message, parallel, and wait for all of them.
 3. **Failures:** a reviewer that errors or returns no `Verdict:` line → retry once, then mark `not run`, never clean. See `${CLAUDE_PLUGIN_ROOT}/skills/review/references/resolve.md` §3.
 4. **Classify** each divergence:
    - `missing`: the doc promises something the code lacks.

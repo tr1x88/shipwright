@@ -107,6 +107,7 @@ Every other decision is made on the spot and logged in `plan.md` as `Ruling: <de
 | `/sw:debug` | Root cause first: reproduce → trace → one hypothesis at a time → failing test → fix |
 | `/sw:verify` | The local gate, with a temporary, guarded auth bypass for smoke tests |
 | `/sw:review` | `sw-reviewer` (Sonnet for small, Opus for large/security) against design + plan; how to receive feedback |
+| `/sw:board` | Local live web board (`http://127.0.0.1:4477`): every task's stage timings and tickets (todo / in progress / done / blocked) from the shared SQLite DB; needs Node ≥ 22.5 |
 | `/sw:drift` | One fresh-context `sw-goldfish` per spec in `docs/specs` vs current code → `.sw/drift/<date>.md`, report-only |
 | `/sw:llms-txt` | Sync `llms.txt` + topic files ([llmstxt.org](https://llmstxt.org)); `audit` mode for drift |
 | `/sw:pr` | Squash, SSH identity, dual PR, integration branch on conflict |

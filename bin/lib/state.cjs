@@ -43,6 +43,13 @@ function write(dir, patch) {
   }
   if (stages.length) next.stages = stages;
   fs.writeFileSync(file(dir), JSON.stringify(next, null, 2) + '\n');
+  if (next.slug && next.stage) {
+    try {
+      require('./db.cjs').trackStage(next.mainRoot || dir, next.slug, next.size, next.stage); // stage timings + board
+    } catch {
+      /* Node < 22.5 or a locked DB: the state file is still the source for statusline/resume */
+    }
+  }
   return next;
 }
 

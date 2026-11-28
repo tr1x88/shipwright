@@ -5,3 +5,4 @@ node_modules/
 _site/
 *.log
 skills/llms-txt/scripts/__pycache__/
+.worktree/

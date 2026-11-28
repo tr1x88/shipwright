@@ -24,7 +24,7 @@ If the user's instructions define per-owner identity switches (e.g. `aw` work / 
 `git push -u origin $BRANCH`. Body (same for both PRs) written to `.sw/pr-body.md` — write it yourself or dispatch `sw-docs-writer` (pr-body) with `model: haiku`:
 ```markdown
 ## Summary
-<what and why, grouped by area; link docs/specs/<YYMMDD>-<slug>/design.md (turbo: spec.md)>
+<what and why, grouped by area; link docs/specs/<YYMMDD>-<slug>/design.md, or plan.md when there is no design (turbo: spec.md)>
 ## API changes
 <METHOD /path — Added|Changed|Removed; request/response/error changes — or "None.">
 ## Verification
